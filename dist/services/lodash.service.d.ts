@@ -1,0 +1,24 @@
+import { ObjectKeyGeneric } from '@/types/common';
+type Cloneable = Record<string, any> | Array<any> | any;
+type AnyFunction = (...args: any[]) => any;
+export declare const CustomStartCase: (data: string) => string;
+export declare const CustomUpperFirst: (data: string) => string;
+export declare const CustomSnakeCase: (data: string) => string;
+export declare const CustomGet: (obj: any, path: string, defaultValue?: any) => any;
+export declare const CustomCloneDeep: (data: Cloneable) => any;
+export declare const CustomPick: (obj: {
+    [x: string]: any;
+}, keys: string | any[]) => any;
+export declare const CustomStartWord: (data: string) => string;
+export declare const CustomCamelCase: (str: string) => string;
+export declare const CustomIsEmpty: (value: any) => boolean;
+export declare const CustomIsString: (value: Cloneable) => value is string | String;
+export declare const CustomIsEqual: (value1: Cloneable, value2: Cloneable) => boolean;
+export declare const CustomIncludes: (collection: Cloneable, value: Cloneable) => boolean;
+export declare const CustomTruncate: (str: Cloneable, maxLength: number, suffix?: string) => any;
+export declare const CustomDebounce: <T extends AnyFunction>(func: T, delay: number) => (...args: Parameters<T>) => void;
+export declare function CustomFind<T>(collection: T[], predicate: (item: T) => boolean): T | undefined;
+export declare const CustomEndsWith: (str: string, suffix: string) => boolean;
+export declare const CustomIsNil: (value: Cloneable) => boolean;
+export declare const CustomOmit: (obj: ObjectKeyGeneric, keysToOmit: Array<string>) => ObjectKeyGeneric;
+export {};

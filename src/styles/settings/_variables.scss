@@ -1,0 +1,340 @@
+@import './colors';
+/* ==============================
+   Border Radius Properties
+---------------------------------*/
+
+$border-radius-rounded: 50px;
+$border-radius-circle: 50%;
+$global-border-radius: 4px;
+$global-border-radius-minimal: 2px;
+$global-border-radius-8: 8px;
+
+/* ==============================
+   Font Family Settings
+---------------------------------*/
+$font-family: '__Inter_1fc7a2';
+
+/* ==============================
+   Font Size Properties
+---------------------------------*/
+$font-size: 14px;
+
+/* ==============================
+   Box Shadow Properties
+---------------------------------*/
+$box-shadow1: 0 2px 15px 0 rgba(155, 155, 155, 0.1);
+
+/* ==============================
+   Spacers Properties
+---------------------------------*/
+$spacer2: 2px;
+$spacer3: 3px;
+$spacer4: 4px;
+$spacer5: 5px;
+$spacer6: 6px;
+$spacer8: 8px;
+$spacer9: 9px;
+$spacer10: 10px;
+$spacer11: 11px;
+$spacer12: 12px;
+$spacer14: 14px;
+$spacer15: 15px;
+$spacer16: 16px;
+$spacer18: 18px;
+$spacer20: 20px;
+$spacer22: 22px;
+$spacer24: 24px;
+$spacer30: 30px;
+$spacer32: 32px;
+$spacer36: 36px;
+$spacer40: 40px;
+$spacer48: 48px;
+$spacer50: 50px;
+$spacer64: 64px;
+$spacer72: 72px;
+
+$lineHeight:
+	'normal' normal,
+	'10' 10px,
+	'12' 12px,
+	'16' 16px,
+	'18' 18px,
+	'20' 20px,
+	'22' 22px,
+	'23' 23px,
+	'24' 24px,
+	'28' 28px,
+	'30' 30px,
+	'31' 31px,
+	'32' 32px,
+	'38' 38px,
+	'15' 1.5,
+	'138' 1.38,
+	'154' 1.54,
+	'157' 1.57,
+	'158' 1.58,
+	'164' 1.64,
+	'167' 1.67,
+	'169' 1.69,
+	'172' 1.72,
+	'175' 1.75,
+	'183' 1.83;
+
+$crmColorConfig:
+	'primary' $primary-color,
+	'secondary' $secondary-color,
+	'white' $white,
+	'black' $black,
+	'black-06' $black-06,
+	'grey-secondary' $grey-secondary,
+	'text-grey-primary' $text-grey-primary,
+	'text-grey-secondary' $text-grey-secondary,
+	'text-grey-hint' $text-grey-hint,
+	'orange-darken1' $orange-darken1,
+	'orange-darken2' $orange-darken2,
+	'orange-darken3' $orange-darken3,
+	'orange-lighten1' $orange-lighten1,
+	'orange-lighten2' $orange-lighten2,
+	'orange-lighten3' $orange-lighten3,
+	'orange-lighten4' $orange-lighten4,
+	'orange-lighten5' $orange-lighten5,
+	'blue' $blue,
+	'blue-darken1' $blue-darken1,
+	'blue-darken2' $blue-darken2,
+	'blue-darken3' $blue-darken3,
+	'blue-darken4' $blue-darken4,
+	'blue-darken5' $blue-darken5,
+	'blue-darken6' $blue-darken6,
+	'blue-darken7' $blue-darken7,
+	'blue-darken8' $blue-darken8,
+	'blue-darken9' $blue-darken9,
+	'blue-darken10' $blue-darken10,
+	'blue-darken11' $blue-darken11,
+	'blue-lighten1' $blue-lighten1,
+	'blue-lighten2' $blue-lighten2,
+	'blue-lighten3' $blue-lighten3,
+	'blue-lighten4' $blue-lighten4,
+	'blue-lighten5' $blue-lighten5,
+	'blue-lighten6' $blue-lighten6,
+	'blue-lighten7' $blue-lighten7,
+	'blue-lighten8' $blue-lighten8,
+	'blue-lighten9' $blue-lighten9,
+	'blue-lighten11' $blue-lighten11,
+	'blue-lighten12' $blue-lighten12,
+	'grey-darken1' $grey-darken1,
+	'grey-darken2' $grey-darken2,
+	'grey-darken3' $grey-darken3,
+	'grey-darken4' $grey-darken4,
+	'grey-darken5' $grey-darken5,
+	'grey-lighten1' $grey-lighten1,
+	'grey-lighten2' $grey-lighten2,
+	'grey-lighten3' $grey-lighten3,
+	'grey-lighten4' $grey-lighten4,
+	'grey-lighten5' $grey-lighten5,
+	'red' $red,
+	'red-darken1' $red-darken1,
+	'red-darken2' $red-darken2,
+	'red-darken3' $red-darken3,
+	'red-lighten1' $red-lighten1,
+	'red-lighten2' $red-lighten2,
+	'red-lighten3' $red-lighten3,
+	'red-lighten4' $red-lighten4,
+	'red-lighten5' $red-lighten5,
+	'red-lighten6' $red-lighten6,
+	'green' $green,
+	'green-darken1' $green-darken1,
+	'green-lighten1' $green-lighten1,
+	'green-lighten2' $green-lighten2,
+	'green-lighten3' $green-lighten3,
+	'green-lighten4' $green-lighten4,
+	'green-lighten5' $green-lighten5,
+	'yellow' $yellow,
+	'yellow-lighten1' $yellow-lighten1,
+	'yellow-lighten2' $yellow-lighten2,
+	'border' $border,
+	'border-1' $border-1,
+	'light-brown' $light-brown,
+	'white-1' $white-1,
+	'popper-border' $popper-border,
+	'cancel-border' $cancel-border,
+	'light-brown1' $light-brown1,
+	'brown-dark1' $brown-dark1,
+	'error-dark1' $error-dark1,
+	'new-red-lighten2' $new-red-lighten2,
+	'success-green' $success-green,
+	'success-green-lighten1' $success-green-lighten1,
+	'success-disabled' $success-disabled,
+	'success-border' $success-border,
+	'new-red-lighten1' $new-red-lighten1,
+	'disabled' $disabled,
+	'blue-lighten10' $blue-lighten10,
+	'horizontal-line' $horizontal-line,
+	'avatarColor' $avatarColor,
+	'close-icon' $close-icon,
+	'user-purple' $user-purple,
+	'transparent' transparent,
+	'none' none,
+  'task-dashboard-border' $task-dashboard-border, 
+  'bg-task' $bg-task,
+  'task-color' $task-color;
+
+//Border Radius
+$radius2: 0.125rem;
+$radius4: 0.25rem;
+$radius5: 0.313rem;
+$radius6: 0.375rem;
+$radius8: 0.5rem;
+$radius10: 0.625rem;
+$radius12: 0.75rem;
+$radius16: 1rem;
+$radius20: 1.25rem;
+$radius360: 22.5rem;
+$circle-radius: 50%;
+
+//Shadows
+$primary-border-shadow: 0 0 0 0.063rem var(--primary);
+
+$pxToRemConfig:
+	-40 -2.5,
+	0 0,
+	1 0.063,
+	2 0.125,
+	3 0.188,
+	4 0.25,
+	5 0.313,
+	6 0.375,
+	8 0.5,
+	10 0.625,
+	11 0.688,
+	12 0.75,
+	13 0.813,
+	14 0.875,
+	15 0.938,
+	16 1,
+	18 1.125,
+	20 1.25,
+	21 1.313,
+	22 1.375,
+	24 1.5,
+	27 1.688,
+	28 1.75,
+	30 1.875,
+	32 2,
+	34 2.125,
+	35 2.188,
+	36 2.25,
+	40 2.5,
+	41 2.563,
+	42 2.625,
+	44 2.75,
+	46 2.875,
+	48 3,
+	50 3.125,
+	52 3.25,
+	56 3.5,
+	60 3.75,
+	62 3.875,
+	64 4,
+	65 4.063,
+	68 4.25,
+	70 4.375,
+	72 4.5,
+	64 4,
+	71 4.438,
+	72 4.5,
+	74 4.625,
+    78 4.875,
+	80 5,
+	88 5.5,
+	90 5.625,
+	92 5.75,
+	104 6.5,
+	100 6.25,
+	106 6.625,
+	110 6.875,
+	116 7.25,
+	120 7.5,
+	122 7.625,
+	124 7.75,
+	128 8,
+	132 8.25,
+	138 8.625,
+	140 8.75,
+	143 8.938,
+	146 9.125,
+	154 9.625,
+	159 9.938,
+	160 10,
+	168 10.5,
+	170 10.625,
+    176 11,
+	180 11.25,
+	188 11.75,
+	193 12.063,
+	200 12.5,
+	202 12.625,
+	204 12.75,
+	208 13,
+	210 13.125,
+	214 13.375,
+	218 13.625,
+	220 13.75,
+	224 14,
+	226 14.125,
+	233 14.563,
+	137 14.813,
+	240 15,
+	245 15.313,
+    248 15.5,
+	250 15.625,
+	260 16.25,
+	268 16.75,
+	269 16.813,
+	274 17.125,
+	280 17.5,
+	300 18.75,
+	311 19.438,
+	316 19.75,
+	308 19.25,
+	310 19.375,
+	317 19.813,
+	328 20.5,
+	340 21.25,
+	346 21.625,
+    348 21.75,
+	351 21.938,
+    354 22.125,
+	359 22.438,
+	360 22.5,
+	370 23.125,
+	375 23.438,
+	388 24.25,
+	400 25,
+	420 26.25,
+	438 27.375,
+	440 27.5,
+	460 28,
+	415 25.938,
+    417 26.063
+	420 26.25,
+	438 27.375,
+	440 27.5,
+	452 28.25,
+	480 30,
+	500 31.25,
+	520 32.5,
+    526 32.875,
+	552 34.5,
+	560 35,
+	592 37,
+	600 37.5,
+	640 40,
+	650 40.625,
+	700 43.75,
+	720 45,
+	772 48.25,
+	800 50,
+    822 51.375,
+	1006 62.875,
+	1068 66.75,
+	1150 71.875;

@@ -1,0 +1,829 @@
+/* Material Button style overwrite here */
+
+button {
+	font-family: $font-family !important;
+
+	&:disabled:hover {
+		cursor: not-allowed;
+	}
+}
+
+button.MuiButton-root {
+	@include font($font-size, 1, 600, $text-grey-secondary);
+	box-shadow: none;
+	transition: all 0.3s;
+	letter-spacing: normal;
+	border-radius: $global-border-radius-8;
+	min-width: 64px;
+	outline: none;
+	border: none;
+	padding: 0 $spacer24;
+	height: 40px;
+	text-transform: none;
+	white-space: nowrap;
+
+	&.small {
+		padding: 0 $spacer16;
+	}
+
+	&.small-button {
+		height: 32px;
+	}
+
+	&.cancel {
+		border: 1px solid $cancel-border !important;
+		color: $text-grey-primary !important;
+	}
+
+	&.medium-button {
+		height: 36px;
+	}
+
+	&.register-button {
+		height: 48px;
+	}
+
+	&.large {
+		font-size: 16px;
+		font-weight: bold;
+		padding: $spacer8 $spacer4;
+	}
+
+	&.activity-add-btn {
+		font-weight: 500 !important;
+		font-size: 12px !important;
+		height: 32px !important;
+		min-height: 32px !important;
+	}
+
+	&.tooltip-btn {
+		height: 32px;
+		font-size: 12px !important;
+		padding: $spacer4 $spacer8;
+	}
+
+	&.startIcon-button {
+		padding: 0 $spacer16 0 $spacer12;
+
+		.MuiButton-startIcon {
+			margin-left: 0;
+		}
+	}
+
+	&.emaildrawer {
+		margin-left: 10px;
+	}
+
+	&.edit-field {
+		max-width: 233px;
+		width: 276px;
+		background-color: #fb7000;
+	}
+
+	&.add-activities {
+		padding: 14px !important;
+	}
+
+	&.endIcon-button {
+		padding: 0 $spacer12 0 $spacer16;
+
+		.MuiButton-endIcon {
+			margin-left: $spacer4;
+			margin-right: 0;
+		}
+	}
+
+	&.add-new-field {
+		position: absolute;
+		top: 2px;
+		z-index: 999;
+		right: 0px;
+		padding: 0px;
+	}
+
+	&.template-button {
+		&:hover {
+			background-color: $blue-lighten9 !important;
+			border-color: $blue-darken9 !important;
+			color: $blue-darken8;
+		}
+		&.active {
+			background-color: $blue-lighten9 !important;
+			border-color: $blue-darken10 !important;
+			color: $blue-darken10 !important;
+		}
+	}
+	&.add-new-object {
+		height: 36px;
+		padding-right: 8px;
+
+		&.pl-12 {
+			padding-left: 12px;
+		}
+	}
+
+	&.template-email-button {
+		&.is-active {
+			background: $blue-lighten3 !important;
+			border-color: $blue-darken2 !important;
+			color: $blue-darken8 !important;
+		}
+	}
+
+	&.twoIcon-button {
+		padding: 0 $spacer8 0 $spacer8;
+
+		.MuiButton-startIcon {
+			margin: 0 6px 0 0;
+		}
+		.MuiButton-endIcon {
+			margin: 0 0 0 6px;
+		}
+	}
+
+	&.update-task-dueDate {
+		font-size: 12px;
+		color: #0060aa;
+		height: 0px;
+	}
+
+	&.add-object {
+		min-width: 32px;
+		max-width: 32px;
+		width: 100%;
+		padding: 0px;
+		height: 32px;
+		margin: 0px 0px 0px 10px;
+		border-radius: 4px;
+	}
+
+	&.archive {
+		width: 90px;
+		height: 36px;
+		padding: 10px 8px;
+
+		&.MuiButton-textPrimary:hover {
+			background-color: #eff8ff;
+		}
+
+		&:hover {
+			background-color: #eff8ff;
+		}
+
+		.MuiButton-startIcon {
+			margin-left: 0px;
+		}
+	}
+
+	&.active-archive {
+		width: 112px;
+		height: 36px;
+		padding: 10px 8px;
+		background-color: #eff8ff;
+		border-radius: 8px;
+
+		&.MuiButton-textPrimary:hover {
+			background-color: #eff8ff;
+		}
+
+		&.MuiButton-text.MuiButton-textPrimary {
+			background-color: #eff8ff;
+		}
+
+		.MuiButton-startIcon {
+			margin-left: 0px;
+		}
+
+		&:hover {
+			background-color: #eff8ff;
+		}
+	}
+
+	&.customized-table-button {
+		width: 110px;
+		height: 36px;
+		border-radius: 8px;
+		padding: 8px;
+
+		&.MuiButton-text.MuiButton-textPrimary {
+			color: #363f4a;
+		}
+
+		&.MuiButton-text.MuiButton-textPrimary:hover {
+			color: #363f4a;
+		}
+
+		&.MuiButton-textPrimary:hover {
+			background-color: #eff8ff;
+		}
+
+		&:hover {
+			background-color: #eff8ff;
+		}
+	}
+
+	&.sort {
+		width: 69px;
+		height: 36px;
+		border-radius: 8px;
+		padding: 8px;
+
+		&.MuiButton-textPrimary:hover {
+			background-color: #f5f7fa;
+		}
+
+		&.MuiButton-text.MuiButton-textPrimary {
+			color: #363f4a;
+		}
+	}
+
+	&.sort-clear {
+		width: 84px;
+		height: 40px;
+	}
+
+	&.sort-option {
+		padding: 11.5px 16px;
+
+		&.cancel {
+			border: 1px solid #bcbfc3;
+		}
+
+		&.blue {
+			border: 1px solid #f5f7fa;
+		}
+	}
+
+	&.cancel-btn {
+		&.MuiButton-textPrimary:hover {
+			background-color: #bcbfc3;
+			border: #bcbfc3;
+		}
+	}
+
+	&.blue {
+		&.MuiButton-textPrimary:hover {
+			background-color: #f5f7fa;
+		}
+	}
+
+	&.add-new-card {
+		border-style: dashed;
+		min-width: 224px;
+		max-width: 224px;
+		width: 100%;
+		height: 32px;
+		padding: 8px, 10px, 8px, 10px;
+		border-width: 1px;
+		border-color: #a8bed1;
+		margin-left: 8px;
+	}
+
+	&.add-date {
+		max-height: 20px;
+		height: 100%;
+		max-width: 100px;
+		width: 100%;
+		color: $blue-darken10;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	&.join-meeting {
+		max-width: 121px;
+		width: 100%;
+		min-height: 32px !important;
+		height: 32px !important;
+		border: 1px solid $blue-darken8;
+		padding: 10px !important;
+		font-size: 12px !important;
+		font-weight: 500 !important;
+	}
+
+	&.task-completed {
+		max-width: 126px !important;
+		width: 100%;
+		height: 32px !important;
+		min-height: 32px !important;
+		border-radius: 8px;
+		padding: 8px;
+		font-weight: 500;
+		font-size: 12px;
+		color: $grey-darken4;
+
+		&.make-complete {
+			border: 1px solid $border-1;
+			color: $grey-darken4;
+		}
+
+		&.make-uncompleted {
+			border: 1px solid $success-border;
+			background-color: $success-green-lighten1;
+			color: $success-green;
+		}
+	}
+
+	&.save-filter {
+		min-width: 40px;
+		width: 40px;
+	}
+
+	.add-new-filter {
+		padding: 0px 3px;
+	}
+	&.add-new-field {
+		position: fixed;
+		z-index: 999;
+		right: 23px;
+		top: 123px;
+	}
+
+	&.create-field {
+		width: 100%;
+		height: 40px;
+		padding: 10px;
+		border-radius: 8px;
+	}
+}
+
+button.MuiButton-text {
+	&:hover {
+		background-color: $grey-lighten2;
+	}
+
+	&.MuiButton-textPrimary {
+		color: $primary-color;
+
+		&:hover {
+			background-color: $orange-lighten4;
+		}
+	}
+
+	&.MuiButton-textSecondary {
+		color: $blue-darken8;
+
+		&:hover {
+			background-color: $blue-lighten4;
+		}
+	}
+
+	&.blue {
+		color: $blue-darken4;
+
+		&.active,
+		&:hover {
+			background-color: $blue-lighten3;
+		}
+
+		&.font-adjust {
+			@include font(13px, 24px, 600, $blue-darken4 !important);
+
+			.MuiButton-iconSizeMedium > *:first-child {
+				font-size: 16px;
+				margin-right: 0 !important;
+			}
+		}
+	}
+
+	&.red {
+		color: $red;
+
+		&:hover {
+			background-color: $red-lighten2;
+		}
+	}
+
+	&.Mui-disabled {
+		color: $grey-darken1 !important;
+		background: transparent !important;
+		cursor: not-allowed;
+		pointer-events: unset;
+	}
+}
+
+button.MuiButton-contained {
+	background-color: $text-grey-secondary;
+	border: 1px solid $text-grey-secondary;
+	color: $white;
+
+	&:hover {
+		background-color: $text-grey-hint;
+		border-color: $text-grey-hint;
+		box-shadow: none;
+	}
+
+	&.MuiButton-containedPrimary {
+		background: $primary-color;
+		border: 1px solid $primary-color;
+
+		&:hover {
+			background-color: $orange-darken1;
+			border-color: $orange-darken1;
+		}
+	}
+
+	&.MuiButton-containedSecondary {
+		background: $blue-darken8;
+		border: 1px solid $blue-darken8;
+
+		&:hover {
+			background-color: $blue-darken1;
+			border-color: $blue-darken1;
+		}
+	}
+
+	&.blue {
+		background: $blue-darken5;
+		border: 1px solid $blue-darken5;
+		color: $white !important;
+
+		&:hover {
+			background-color: $blue-darken5;
+		}
+	}
+
+	&.pipeline-button {
+		background: $white;
+		border: 1px solid $white;
+		color: $blue-darken8 !important;
+
+		.pipeline-button-text {
+			max-width: 200px;
+		}
+
+		&:hover,
+		&.is-active {
+			background-color: $blue-lighten4;
+		}
+	}
+
+	&.filter {
+		background: $blue-lighten3;
+		border: 1px solid $blue-lighten3;
+		color: $blue-darken8;
+
+		&:hover {
+			background-color: $blue-lighten3;
+		}
+	}
+
+	&.flat-filter-button {
+		background: $blue-lighten3;
+		border: 1px solid $blue-lighten3;
+		color: $blue-darken8;
+
+		&.MuiButton-contained {
+			@include font(13px, 22px, 600, $blue-darken8 !important);
+			padding: $spacer4 $spacer8;
+		}
+
+		&:hover {
+			background-color: $blue-lighten3;
+			border-color: $blue-lighten3;
+		}
+	}
+
+	&.activity-flat-button {
+		background: $blue-lighten4 !important;
+		border: 1px solid $blue-lighten4 !important;
+		color: $text-grey-hint;
+		padding: $spacer4 $spacer10 !important;
+		border-radius: 4px !important;
+
+		&.MuiButton-contained {
+			@include font(13px, 22px, 600, $text-grey-hint !important);
+			padding: $spacer4 $spacer16;
+		}
+
+		&:hover,
+		&.is-active {
+			background-color: $blue-darken1 !important;
+			color: $white !important;
+			border: 1px solid $blue-darken1 !important;
+		}
+
+		&.activity-flat-Iconbutton .MuiSvgIcon-root {
+			font-size: 16px;
+		}
+	}
+
+	&.red {
+		background: $red;
+		border: 1px solid $red;
+		color: $white !important;
+
+		&:hover {
+			background-color: $red;
+		}
+	}
+
+	&.Mui-disabled {
+		color: $grey-darken1 !important;
+		background-color: $grey-lighten1 !important;
+		border-color: $grey-lighten1 !important;
+		cursor: not-allowed;
+		pointer-events: unset;
+	}
+}
+
+button.MuiButton-outlined {
+	border: 1px solid $text-grey-secondary;
+
+	&:hover {
+		background-color: $grey-lighten2;
+	}
+
+	&.MuiButton-outlinedPrimary {
+		border: 1px solid #ffe0a5;
+		color: $primary-color;
+
+		&:hover {
+			background-color: $orange-lighten4;
+		}
+	}
+
+	&.template-button {
+		height: 44px;
+		font-weight: 500;
+		border-color: $border-1 !important;
+		color: $grey-darken4 !important;
+	}
+
+	&.MuiButton-outlinedSecondary,
+	&.blue-dark {
+		&.manage-btn {
+			padding: 5px 15px;
+		}
+		border: 1px solid $blue-darken8;
+		color: $blue-darken8;
+
+		&:hover {
+			background-color: $blue-lighten4;
+		}
+	}
+
+	&.grey {
+		border: 1px solid $border;
+		color: $black;
+
+		&:hover {
+			background-color: $grey-lighten2;
+			box-shadow: none;
+		}
+
+		&.color-grey {
+			color: $text-grey-hint !important;
+		}
+
+		&.grey-darken1 {
+			.MuiButton-label {
+				color: $grey-darken1 !important;
+			}
+		}
+
+		&.no-border-radius {
+			border-radius: unset;
+			line-height: 32px;
+		}
+	}
+
+	&.grey-dark {
+		border: 1px solid $text-grey-hint;
+		padding: $spacer4;
+		@include font(13px, normal, 600, $text-grey-hint);
+
+		&:hover {
+			background-color: $grey-lighten2;
+			box-shadow: none;
+		}
+	}
+
+	&.blue {
+		border: 1px solid $blue-darken3;
+		color: $blue-darken1;
+		border-radius: $global-border-radius-8 !important;
+
+		&:hover {
+			background-color: $blue-lighten4;
+		}
+	}
+
+	&.error-field {
+		border: 1px solid $red;
+	}
+
+	&.red {
+		color: $red;
+		border: 1px solid $red;
+
+		&:hover {
+			background-color: $red-lighten2;
+		}
+	}
+
+	&.green {
+		color: $green;
+		border: 1px solid $green;
+
+		&:hover {
+			background-color: $green-lighten2;
+		}
+	}
+
+	&.Mui-disabled {
+		border: 1px solid $grey-darken2 !important;
+		background: $white !important;
+		color: $grey-darken1 !important;
+	}
+}
+
+/* Icon Button Section */
+button.MuiIconButton-root {
+	&.Mui-disabled {
+		color: $grey-darken1 !important;
+		pointer-events: unset;
+		cursor: not-allowed;
+
+		&:hover {
+			background: $grey-lighten1 !important;
+		}
+	}
+
+	&.MuiIconButton-colorPrimary {
+		color: $primary-color;
+
+		&:hover {
+			background-color: $orange-lighten4;
+		}
+	}
+
+	&.MuiIconButton-colorSecondary {
+		color: $blue-darken8;
+
+		&:hover {
+			background-color: $blue-lighten4;
+		}
+	}
+
+	&.button-b-color {
+		background-color: white;
+	}
+
+	&.button-color {
+		color: white;
+	}
+}
+
+/* Button with close icon */
+.filter-with-close-icon {
+	position: relative;
+
+	&.internal-name {
+		background-color: $grey-lighten3 !important;
+		border: none !important;
+
+		&:hover {
+			background-color: $grey-lighten3 !important;
+			border: none !important;
+		}
+	}
+
+	.icon-clear {
+		@include icon(14px, $blue-darken8);
+		@include positionTopLeft(absolute, 9px, 9px);
+		z-index: 1;
+	}
+
+	.filter-dropdown-button {
+		@include font(13px, 22px, 600, $text-grey-secondary);
+		transition: none;
+		border: 1px solid $grey-darken2 !important;
+		height: 32px !important;
+		&.default-height {
+			height: 40px !important;
+		}
+	}
+
+	&.filter-with-clear-icon .filter-dropdown-button {
+		padding-left: $spacer32 !important;
+	}
+
+	&.is-active,
+	&:hover {
+		background: $blue-lighten3 !important;
+		color: $blue-darken8 !important;
+
+		.filter-dropdown-button {
+			background: $blue-lighten3 !important;
+			border-color: $blue-darken2 !important;
+			color: $blue-darken8 !important;
+		}
+	}
+
+	&.is-disable {
+		&:hover {
+			color: $grey-darken1 !important;
+			border: 1px solid $grey-darken2;
+			cursor: not-allowed;
+			background: none !important;
+		}
+
+		.filter-dropdown-button {
+			&:disabled {
+				color: $grey-darken1 !important;
+				border-radius: $global-border-radius-8;
+				border: none;
+				background: none !important;
+				cursor: not-allowed;
+			}
+		}
+	}
+}
+
+.quick-add-button {
+	@include font(11px !important, normal !important, 600 !important, $text-grey-hint !important);
+	.MuiButton-startIcon {
+		margin-left: 0 !important;
+	}
+	&:focus,
+	&:hover {
+		background: $blue-lighten4;
+		span {
+			color: $blue-darken1;
+		}
+	}
+	span {
+		display: flex;
+		align-items: center;
+		@include font(14px, normal, 600, $text-grey-secondary);
+		justify-content: flex-start;
+	}
+}
+
+/* dropdown border bottom styles here */
+
+.bottom-dropdown {
+	border: none !important;
+	border-radius: 0 !important;
+	border-bottom: 1px solid $border !important;
+	height: 32px !important;
+	padding: 0 !important;
+	&.large-button {
+		height: 38px !important;
+	}
+}
+
+.clear-filter-button {
+	height: 28px !important;
+	padding: 4px 8px !important;
+}
+
+.mail-to-button {
+	.MuiButton-endIcon {
+		margin: 0;
+	}
+}
+
+.info-button.MuiButton-root {
+	height: 32px;
+	border-radius: 7px;
+	font-weight: 500;
+}
+
+.temp-create-tab-section {
+	position: relative;
+	.MuiIconButton-root {
+		position: sticky;
+		right: 0;
+		padding: 6px;
+		background-color: $white;
+		color: $grey-darken5;
+		border-radius: unset;
+		&:hover {
+			background-color: $blue-lighten9 !important;
+			color: $blue-darken8;
+		}
+	}
+}
+
+//snack-bar button
+
+.snack-bar-button {
+	&.MuiButtonBase-root {
+		min-width: fit-content;
+	}
+}
+
+.quick-field {
+	&.MuiButtonBase-root {
+		width: 42px;
+		height: 40px;
+		padding: 0px;
+		min-width: 42px;
+		min-height: 40px;
+		color: #0079d2 !important;
+	}
+	&.MuiButton-text.MuiButton-textPrimary:hover {
+		background-color: #ffffff !important;
+	}
+}

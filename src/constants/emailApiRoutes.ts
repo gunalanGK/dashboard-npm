@@ -1,0 +1,18 @@
+export const emailApiRoutes = {
+	listEmails: 'workspace/:workspaceId/emails',
+	emailCounts: 'workspace/:workspaceId/emails/counts',
+	markAsRead: 'workspace/:workspaceId/emails/mark-as-read',
+	sendMail: 'workspace/:workspaceId/emails/send',
+	createDraft: 'workspace/:workspaceId/emails/create-draft',
+	getMainThread: 'workspace/:workspaceId/emails/main-thread',
+	moveToTrash: 'workspace/:workspaceId/emails/move-to-trash',
+	moveToInbox: 'workspace/:workspaceId/emails/move-to-inbox',
+	moveAllToTrash: 'workspace/:workspaceId/emails/move-all-to-trash',
+	deleteAllForever: 'workspace/:workspaceId/emails/delete-all-forever',
+	deleteForever: 'workspace/:workspaceId/emails/delete-forever',
+	cancelSchedule: 'workspace/:workspaceId/emails/cancel-schedule',
+	reschedule: 'workspace/:workspaceId/emails/reschedule',
+	deleteAttachment: 'workspace/:workspaceId/emails/:emailId/attachments/:attachmentId',
+	uploadAttachment: 'workspace/:workspaceId/emails/:emailId/attachments/:attachmentId',
+	getConnectedEmailsHistory: 'workspace/:workspaceId/emails/connected-emails-from-history',
+};

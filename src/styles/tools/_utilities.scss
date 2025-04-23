@@ -1,0 +1,1350 @@
+@import '../settings/variables';
+@import './mixins';
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0rem;
+	padding: 0rem;
+	font-family: $font-family !important;
+	color: #212529;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+}
+
+/* Heading and sub heading styles here */
+h1 {
+	&.heading {
+		@include font(44px, normal, 700, $grey-lighten1);
+	}
+}
+
+h4 {
+	&.title {
+		@include font(24px, 32px, 600, $text-grey-primary);
+	}
+	&.sub-title {
+		@include font(22px, 30px, 700, $text-grey-primary);
+	}
+}
+
+h5 {
+	&.heading {
+		@include font(20px, normal, bold, $text-grey-primary);
+	}
+
+	&.title {
+		@include font(20px, 28px, 600, $text-grey-primary);
+	}
+
+	&.heading-small {
+		@include font(18px, normal, bold, $text-grey-secondary);
+
+		&.letter-spacing {
+			letter-spacing: 0.26px;
+		}
+	}
+
+	&.sub-title {
+		@include font(18px, 24px, 600, $text-grey-primary);
+	}
+
+	&.sub-heading {
+		@include font(18px, 28px, 800, $text-grey-primary);
+	}
+}
+
+h6 {
+	&.heading {
+		@include font(16px, 22px, 700, $text-grey-primary);
+	}
+	&.sub-heading {
+		@include font(16px, 22px, 600, $text-grey-primary);
+	}
+	&.title {
+		@include font(16px, 20px, bold, $text-grey-primary);
+	}
+}
+
+p,
+span {
+	&.description {
+		@include font(14px, 22px, 700, $text-grey-primary);
+	}
+
+	&.header {
+		@include font(14px, 20px, 700, $text-grey-primary);
+	}
+
+	&.sub-header {
+		@include font(14px, 20px, 600, $text-grey-primary);
+	}
+
+	&.summary {
+		@include font(14px, 20px, normal, $text-grey-hint);
+	}
+
+	&.details {
+		@include font(14px, 20px, normal, $text-grey-secondary);
+	}
+
+	&.title {
+		@include font(13px, 18px, 600, $text-grey-hint);
+	}
+
+	&.sub-title {
+		@include font(13px, 18px, 700, $text-grey-primary);
+	}
+
+	&.sub-details {
+		@include font(13px, 18px, 400, $text-grey-secondary);
+	}
+
+	&.sub-summary {
+		@include font(13px, 20px, 400, $text-grey-hint);
+	}
+
+	&.hint {
+		@include font(12px, 16px, normal, $grey-darken1);
+	}
+
+	&.info {
+		@include font(12px, 18px, normal, $text-grey-hint);
+	}
+
+	&.date-info {
+		@include font(11px, 18px, normal, $text-grey-hint);
+	}
+
+	&.small {
+		@include font(12px, normal, normal, $text-grey-hint);
+	}
+
+	&.small-label {
+		@include font(11px, 16px, normal, $text-grey-hint);
+	}
+
+	&.hint-md {
+		@include font(11px, 16px, 600, $grey-darken1);
+	}
+
+	&.hint-sm {
+		@include font(10px, 14px, normal, $text-grey-hint);
+		letter-spacing: 0.1px;
+	}
+
+	&.hint-xs {
+		@include font(10px, 14px, 600, $grey-darken1);
+	}
+	&.detail-xs {
+		@include font(9px, normal, 600, $grey-darken1);
+	}
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+}
+
+a {
+	text-decoration: none;
+}
+
+// Container styles
+.container {
+	width: 100%;
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-right: auto;
+	margin-left: auto;
+}
+@media (min-width: 100vw) {
+	.container {
+		max-width: 100vw;
+	}
+}
+
+//Font Size
+@each $font in $pxToRemConfig {
+	.f-#{nth($font, 1)} {
+		font-size: #{nth($font, 2)}rem !important;
+	}
+}
+
+@each $font in $pxToRemConfig {
+	.f-icon-#{nth($font, 1)} {
+		.MuiSvgIcon-root {
+			font-size: #{nth($font, 2)}rem !important;
+		}
+	}
+}
+
+//Font-weight
+$fontWeightConfig: 200, 300, 400, 500, 600, 700, 800, bold, normal;
+@each $weight in $fontWeightConfig {
+	.f-w-#{$weight} {
+		font-weight: $weight !important;
+	}
+}
+
+//Line-height
+@each $height in $pxToRemConfig {
+	.l-h-#{nth($height, 1)} {
+		line-height: #{nth($height, 2)}rem;
+	}
+}
+.l-h {
+	&-normal {
+		line-height: normal;
+	}
+}
+
+//letter-space
+@each $space in $pxToRemConfig {
+	.l-s-#{nth($space, 1)} {
+		letter-spacing: #{nth($space, 2)}rem;
+	}
+}
+
+@each $space in $pxToRemConfig {
+	.right-#{nth($space, 1)}px {
+		right: #{nth($space, 2)}rem;
+	}
+}
+
+@each $space in $pxToRemConfig {
+	.left-#{nth($space, 1)}px {
+		left: #{nth($space, 2)}rem;
+	}
+}
+
+@each $space in $pxToRemConfig {
+	.top-#{nth($space, 1)}px {
+		top: #{nth($space, 2)}rem;
+	}
+}
+
+// color
+@each $color in $crmColorConfig {
+	.txt-#{nth($color, 1)} {
+		color: nth($color, 2) !important;
+	}
+}
+
+//Background color
+@each $color in $crmColorConfig {
+	.bg-#{nth($color, 1)} {
+		background-color: nth($color, 2) !important;
+	}
+}
+
+@each $color in $crmColorConfig {
+	.bg-#{nth($color, 1)} {
+		background: nth($color, 2) !important;
+	}
+}
+
+// Border Style
+
+$borderStyle:
+	border border,
+	border-t border-top,
+	border-b border-bottom,
+	border-l border-left,
+	border-r border-right;
+$borderShape: solid, dashed;
+@each $borderValue in $borderStyle {
+	@each $shape in $borderShape {
+		@each $borderColor in $crmColorConfig {
+			.#{nth($borderValue, 1)}-#{nth($shape, 1)}-#{nth($borderColor, 1)} {
+				#{nth($borderValue, 2)}: 0.063rem nth($shape, 1) nth($borderColor, 2) !important;
+			}
+		}
+	}
+}
+
+$borderStyle:
+	border border,
+	border-t border-top,
+	border-b border-bottom,
+	border-l border-left,
+	border-r border-right;
+$borderShape: solid, dashed;
+@each $borderValue in $borderStyle {
+	@each $shape in $borderShape {
+		@each $borderColor in $crmColorConfig {
+			@each $size in $pxToRemConfig {
+				.#{nth($borderValue, 1)}-#{nth($shape, 1)}-#{nth($borderColor, 1)}-#{nth($size, 1)} {
+					#{nth($borderValue, 2)}: #{nth($size, 2)}rem nth($shape, 1) nth($borderColor, 2);
+				}
+			}
+		}
+	}
+}
+
+@each $borderValue in $borderStyle {
+	.#{nth($borderValue, 1)}-0 {
+		#{nth($borderValue, 1)}: 0 !important;
+	}
+}
+
+//Hover Classes
+@each $color in $crmColorConfig {
+	.hover-#{nth($color, 1)} {
+		&:hover,
+		&:focus {
+			color: nth($color, 2) !important;
+		}
+	}
+}
+
+// @each $color in $crmColorConfig {
+//   .bg-hover-#{nth($color, 1)} {
+//     &:hover,
+//     &:focus {
+//       background: nth($color, 2) !important;
+//     }
+//   }
+// }
+
+@each $color in $crmColorConfig {
+	.bg-hover-#{nth($color, 1)} {
+		&:hover,
+		&:focus {
+			background-color: nth($color, 2) !important;
+		}
+	}
+}
+
+@each $color in $crmColorConfig {
+	.border-color-hover-#{nth($color, 1)} {
+		&:hover,
+		&:focus {
+			border-color: nth($color, 2) !important;
+		}
+	}
+}
+
+$hoverOpacity:
+	0 0,
+	75 0.75;
+@each $opacity in $hoverOpacity {
+	.opacity-hover-#{nth($opacity, 1)} {
+		&:hover,
+		&:focus {
+			opacity: nth($opacity, 2);
+		}
+	}
+}
+
+// Circle size
+@each $circle in $pxToRemConfig {
+	.size-#{nth($circle, 1)} {
+		@include size(#{nth($circle, 2)}rem !important);
+	}
+}
+
+//Width
+
+$sizePercentage:
+	'100vh' 100vh,
+	'100vw' 100vw,
+	'100' 100%,
+	'75' 75%,
+	'60' 60%,
+	'50' 50%,
+	'33' 33.33%,
+	'25' 25%,
+	'fit' fit-content,
+	'max' fit-content,
+	'unset' unset,
+	'auto' auto;
+
+@each $size in $sizePercentage {
+	.w-#{nth($size, 1)} {
+		width: nth($size, 2);
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.w-#{nth($size, 1)}px {
+		width: #{nth($size, 2)}rem;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.h-#{nth($size, 1)}px {
+		height: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.mch-#{nth($size, 1)}px {
+		max-height: calc(100vh - #{nth($size, 2)}rem) !important;
+		min-height: calc(100vh - #{nth($size, 2)}rem) !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.mach-#{nth($size, 1)}px {
+		max-height: calc(100vh - #{nth($size, 2)}rem) !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.mh-#{nth($size, 1)}px {
+		max-height: #{nth($size, 2)}rem !important;
+		min-height: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.mw-#{nth($size, 1)}px {
+		max-width: #{nth($size, 2)}rem !important;
+		min-width: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $sizePercentage {
+	.maxh-#{nth($size, 1)} {
+		max-height: #{nth($size, 2)} !important;
+	}
+}
+
+@each $size in $sizePercentage {
+	.maxw-#{nth($size, 1)} {
+		max-width: #{nth($size, 2)};
+	}
+}
+@each $size in $sizePercentage {
+	.minw-#{nth($size, 1)} {
+		min-width: #{nth($size, 2)};
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.maxw-#{nth($size, 1)}px {
+		max-width: #{nth($size, 2)}rem;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.minw-#{nth($size, 1)}px {
+		min-width: #{nth($size, 2)}rem !important;
+	}
+}
+
+//Height
+@each $size in $pxToRemConfig {
+	.h-#{nth($size, 1)}px {
+		height: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.maxh-#{nth($size, 1)}px {
+		max-height: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $pxToRemConfig {
+	.minh-#{nth($size, 1)}px {
+		min-height: #{nth($size, 2)}rem !important;
+	}
+}
+
+@each $size in $sizePercentage {
+	.h-#{nth($size, 1)} {
+		height: nth($size, 2) !important;
+	}
+}
+
+//Cursor
+$cursorType: pointer, default, disabled, none, not-allowed, grab;
+@each $cursor in $cursorType {
+	.cursor-#{nth($cursor, 1)} {
+		cursor: nth($cursor, 1) !important;
+	}
+}
+
+//pointer-event
+$pointerEvent: none, allow;
+@each $cursor in $cursorType {
+	.pointer-#{nth($cursor, 1)} {
+		pointer-events: nth($cursor, 1);
+	}
+}
+
+//Overflow
+
+$overflow: auto, none, hidden;
+@each $flow in $overflow {
+	.overflow-#{nth($flow, 1)} {
+		overflow: nth($flow, 1) !important;
+	}
+}
+
+//Padding and Margin Style
+
+$marginAlign:
+	'auto' auto,
+	'x-auto' auto,
+	'y-auto' auto;
+@each $margin in $marginAlign {
+	.m-#{nth($margin, 1)} {
+		margin: nth($margin, 2);
+	}
+}
+
+$spacerOrigin:
+	'm' margin,
+	'p' padding;
+$spacerPosition:
+	't' top,
+	'b' bottom,
+	'r' right,
+	'l' left;
+$spacerPositionXY:
+	'x' left right,
+	'y' top bottom;
+
+@each $origin in $spacerOrigin {
+	@each $position in $spacerPositionXY {
+		@each $sizing in $pxToRemConfig {
+			.#{nth($origin, 1)}#{nth($position, 1)}-#{nth($sizing, 1)} {
+				#{nth($origin, 2)}-#{nth($position, 2)}: nth($sizing, 2) + rem !important;
+				#{nth($origin, 2)}-#{nth($position, 3)}: nth($sizing, 2) + rem !important;
+			}
+		}
+	}
+}
+
+@each $origin in $spacerOrigin {
+	@each $sizing in $pxToRemConfig {
+		.#{nth($origin, 1)}-#{nth($sizing, 1)} {
+			#{nth($origin, 2)}: nth($sizing, 2) + rem !important;
+		}
+	}
+}
+
+@each $origin in $spacerOrigin {
+	@each $position in $spacerPosition {
+		@each $sizing in $pxToRemConfig {
+			.#{nth($origin, 1)}#{nth($position, 1)}-#{nth($sizing, 1)} {
+				#{nth($origin, 2)}-#{nth($position, 2)}: nth($sizing, 2) + rem !important;
+			}
+		}
+	}
+}
+
+$positionSide:
+	'left' left,
+	'right' right,
+	'top' top,
+	'bottom' bottom;
+
+@each $size in $pxToRemConfig {
+	@each $side in $positionSide {
+		.#{nth($side, 1)}-#{nth($size, 1)} {
+			#{nth($side, 2)}: nth($size, 2) + rem !important;
+		}
+	}
+}
+
+//Z-index styles here
+
+$indexValue: 1, 2, 10, 100, 101, 1000;
+@each $index in $indexValue {
+	.z-index-#{nth($index, 1)} {
+		z-index: nth($index, 1);
+	}
+}
+
+//Text Style
+
+$txtAlign:
+	'left' left,
+	'center' center,
+	'right' right;
+@each $align in $txtAlign {
+	.text-#{nth($align, 1)} {
+		text-align: nth($align, 2) !important;
+	}
+}
+
+$txtTransform: uppercase, lowercase, capitalize;
+@each $transform in $txtTransform {
+	.text-#{$transform} {
+		text-transform: $transform !important;
+	}
+}
+
+$wordBreak: break-word, break-all;
+@each $break in $wordBreak {
+	.word-#{nth($break, 1)} {
+		word-break: nth($break, 1);
+	}
+}
+
+$whiteSpace: wrap, nowrap, break-spaces;
+@each $space in $whiteSpace {
+	.white-space-#{nth($space, 1)} {
+		white-space: nth($space, 1);
+	}
+}
+
+//Display & Flex Classes
+
+$displayClasses: flex, inline-block, block, none, grid;
+@each $display in $displayClasses {
+	.d-#{$display} {
+		display: $display !important;
+	}
+}
+
+$flexWrap: wrap, nowrap;
+@each $wrap in $flexWrap {
+	.flex-#{$wrap} {
+		flex-wrap: $wrap;
+	}
+}
+
+$flexDirection: column, column-reverse;
+@each $direction in $flexDirection {
+	.flex-#{nth($direction, 1)} {
+		flex-direction: nth($direction, 1);
+	}
+}
+
+$flexFlow: 1, 2, 3, unset;
+@each $flow in $flexFlow {
+	.flex-#{$flow} {
+		flex: $flow;
+	}
+}
+
+$flexAlign:
+	'start' flex-start,
+	'center' center,
+	'end' flex-end,
+	'baseline' baseline,
+	'stretch' stretch;
+@each $align in $flexAlign {
+	.align-#{nth($align, 1)} {
+		align-items: nth($align, 2);
+	}
+}
+
+$flexAlign:
+	'start' flex-start,
+	'center' center,
+	'end' flex-end;
+@each $align in $flexAlign {
+	.align-content-#{nth($align, 1)} {
+		align-content: nth($align, 2);
+	}
+}
+
+$flexContent:
+	'start' flex-start,
+	'center' center,
+	'end' flex-end,
+	'between' space-between,
+	'around' space-around,
+	'evenly' space-evenly;
+@each $justify in $flexContent {
+	.justify-#{nth($justify, 1)} {
+		justify-content: nth($justify, 2) !important;
+	}
+}
+
+$placeItems:
+	'start' start,
+	'center' center,
+	'end' end,
+	'start-self' 'start-self',
+	'start-end' 'start-end';
+@each $place in $placeItems {
+	.place-#{nth($place, 1)} {
+		place-items: nth($place, 2);
+	}
+}
+
+@each $gap in $pxToRemConfig {
+	.gap-#{nth($gap, 1)} {
+		gap: nth($gap, 2) + rem;
+	}
+}
+
+/* Column gap styles here */
+@each $gap in $pxToRemConfig {
+	.col-g-#{nth($gap, 1)} {
+		column-gap: nth($gap, 2) + rem;
+		grid-column-gap: nth($gap, 2) + rem;
+	}
+}
+
+/* Row gap styles here */
+@each $gap in $pxToRemConfig {
+	.row-g-#{nth($gap, 1)} {
+		row-gap: nth($gap, 2) + rem;
+		grid-row-gap: nth($gap, 2) + rem;
+	}
+}
+
+// Grid column devide styles here
+
+$gridNumber: 2, 3, 4, 6, 8, 12, 16, 24, 32, 56, auto-fill;
+$gridmaxLength:
+	25 25%,
+	1 1fr,
+	105 6.563rem,
+	auto auto;
+$gridminLength:
+	105 6.563,
+	1 1fr;
+$gridDirection:
+	row rows,
+	col columns;
+
+@each $gridCount in $gridNumber {
+	@each $gridmaxSize in $gridmaxLength {
+		@each $gridminSize in $gridminLength {
+			@each $gridFlow in $gridDirection {
+				.grid-temp-#{nth($gridFlow, 1)}-#{nth($gridCount, 1)}-#{nth($gridminSize, 1)}-#{nth($gridmaxSize, 1)} {
+					grid-template-#{nth($gridFlow, 2)}: repeat(
+						#{nth($gridCount, 1)},
+						minmax(#{nth($gridminSize, 2)}rem, #{nth($gridmaxSize, 2)})
+					);
+				}
+			}
+		}
+	}
+}
+
+//Position
+
+$positionSide: relative, absolute, fixed;
+@each $position in $positionSide {
+	.position-#{nth($position, 1)} {
+		position: nth($position, 1);
+	}
+}
+
+/* Responsive scroll */
+@media only screen and (max-width: 767px) {
+	.page-container {
+		.overflow-auto {
+			max-height: unset !important;
+			height: unset !important;
+			min-height: unset !important;
+			overflow: unset;
+		}
+	}
+}
+
+//Border radius
+
+$borderRadius:
+	0 0,
+	2 $radius2,
+	4 $radius4,
+	5 $radius5,
+	6 $radius6,
+	8 $radius8,
+	10 $radius10,
+	12 $radius12,
+	16 $radius16,
+	20 $radius20,
+	360 $radius360,
+	'circle' 50%;
+@each $radius in $borderRadius {
+	.radius-#{nth($radius, 1)} {
+		border-radius: nth($radius, 2) !important;
+	}
+	//top left
+	.tl-radius-#{nth($radius, 1)} {
+		border-top-left-radius: nth($radius, 2) !important;
+	}
+	//top right
+	.tr-radius-#{nth($radius, 1)} {
+		border-top-right-radius: nth($radius, 2) !important;
+	}
+	//bottom left
+	.bl-radius-#{nth($radius, 1)} {
+		border-bottom-left-radius: nth($radius, 2) !important;
+	}
+	//bottom right
+	.br-radius-#{nth($radius, 1)} {
+		border-bottom-right-radius: nth($radius, 2) !important;
+	}
+}
+
+// Responsive styles starts here
+$responsiveSize:
+	'0' '600px' 'xxs',
+	'0' '767px' 'xs',
+	'768px' '1024px' 'sm',
+	'1024px' '1280px' 'md',
+	'1280px' '1440px' 'lg',
+	'1440px' '1920px' 'xl',
+	'1920px' '2800px' 'xxl';
+
+@each $responsive in $responsiveSize {
+	@media only screen and (min-width: #{nth($responsive,1)}) and (max-width: #{nth($responsive,2)}) {
+		//Padding and Margin
+		@each $origin in $spacerOrigin {
+			@each $position in $spacerPositionXY {
+				@each $sizing in $pxToRemConfig {
+					.#{nth($responsive, 3)}\:#{nth($origin, 1)}#{nth($position, 1)}-#{nth($sizing, 1)} {
+						#{nth($origin, 2)}-#{nth($position, 2)}: nth($sizing, 2) + rem !important;
+						#{nth($origin, 2)}-#{nth($position, 3)}: nth($sizing, 2) + rem !important;
+					}
+				}
+			}
+		}
+		@each $origin in $spacerOrigin {
+			@each $sizing in $pxToRemConfig {
+				.#{nth($responsive, 3)}\:#{nth($origin, 1)}-#{nth($sizing, 1)} {
+					#{nth($origin, 2)}: nth($sizing, 2) + rem !important;
+				}
+			}
+		}
+		@each $origin in $spacerOrigin {
+			@each $position in $spacerPosition {
+				@each $sizing in $pxToRemConfig {
+					.#{nth($responsive, 3)}\:#{nth($origin, 1)}#{nth($position, 1)}-#{nth($sizing, 1)} {
+						#{nth($origin, 2)}-#{nth($position, 2)}: nth($sizing, 2) + rem !important;
+					}
+				}
+			}
+		}
+		//Mobile Responsive background color styles here
+		@each $color in $crmColorConfig {
+			.#{nth($responsive, 3)}\:bg-#{nth($color, 1)} {
+				background-color: nth($color, 2) !important;
+			}
+		}
+
+		@each $margin in $marginAlign {
+			.#{nth($responsive, 3)}\:m-#{nth($margin, 1)} {
+				margin: nth($margin, 2);
+			}
+		}
+
+		//Gap responsive styles here
+		@each $gap in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:col-g-#{nth($gap, 1)} {
+				column-gap: nth($gap, 2) + rem;
+			}
+		}
+
+		//Mobile responsive display properties styles here
+		@each $flow in $flexFlow {
+			.#{nth($responsive, 3)}\:flex-#{$flow} {
+				flex: $flow;
+			}
+		}
+
+		@each $display in $displayClasses {
+			.#{nth($responsive, 3)}\:d-#{$display} {
+				display: $display !important;
+			}
+		}
+		@each $align in $flexAlign {
+			.#{nth($responsive, 3)}\:align-#{nth($align, 1)} {
+				align-items: nth($align, 2);
+			}
+		}
+		@each $direction in $flexDirection {
+			.#{nth($responsive, 3)}\:flex-#{nth($direction, 1)} {
+				flex-direction: nth($direction, 1);
+			}
+		}
+		@each $justify in $flexContent {
+			.#{nth($responsive, 3)}\:justify-#{nth($justify, 1)} {
+				justify-content: nth($justify, 2);
+			}
+		}
+
+		@each $wrap in $flexWrap {
+			.#{nth($responsive, 3)}\:flex-#{$wrap} {
+				flex-wrap: $wrap;
+			}
+		}
+
+		//Mobile responsive font styles here
+		@each $font in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:f-#{nth($font, 1)} {
+				font-size: #{nth($font, 2)}rem !important;
+			}
+		}
+
+		@each $height in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:l-h-#{nth($height, 1)} {
+				line-height: #{nth($height, 2)}rem;
+			}
+		}
+		//Mobile responsive Width styles here
+		@each $size in $sizePercentage {
+			.#{nth($responsive, 3)}\:w-#{nth($size, 1)} {
+				width: nth($size, 2);
+			}
+		}
+
+		@each $size in $sizePercentage {
+			.#{nth($responsive, 3)}\:maxw-#{nth($size, 1)} {
+				max-width: #{nth($size, 2)};
+			}
+		}
+		@each $size in $sizePercentage {
+			.#{nth($responsive, 3)}\:minw-#{nth($size, 1)} {
+				min-width: #{nth($size, 2)} !important;
+			}
+		}
+
+		@each $size in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:maxw-#{nth($size, 1)}px {
+				max-width: #{nth($size, 2)}rem;
+			}
+		}
+		@each $size in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:maxh-#{nth($size, 1)}px {
+				max-height: #{nth($size, 2)}rem !important;
+			}
+		}
+
+		//Mobile responsive height styles here
+		@each $size in $sizePercentage {
+			.#{nth($responsive, 3)}\:h-#{nth($size, 1)} {
+				height: nth($size, 2) !important;
+			}
+		}
+
+		@each $circle in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:size-#{nth($circle, 1)} {
+				@include size(#{nth($circle, 2)}rem !important);
+			}
+		}
+
+		@each $size in $pxToRemConfig {
+			.#{nth($responsive, 3)}\:w-#{nth($size, 1)}px {
+				width: #{nth($size, 2)}rem;
+			}
+		}
+
+		//Mobile responsive text styles here
+
+		@each $align in $txtAlign {
+			.#{nth($responsive, 3)}\:text-#{nth($align, 1)} {
+				text-align: nth($align, 2) !important;
+			}
+		}
+
+		//Mobile responsive radius styles here
+		@each $radius in $borderRadius {
+			.#{nth($responsive, 3)}\:radius-#{nth($radius, 1)} {
+				border-radius: nth($radius, 2) !important;
+			}
+			//top left
+			.#{nth($responsive, 3)}\:tl-radius-#{nth($radius, 1)} {
+				border-top-left-radius: nth($radius, 2) !important;
+			}
+			//top right
+			.#{nth($responsive, 3)}\:tr-radius-#{nth($radius, 1)} {
+				border-top-center-radius: nth($radius, 2) !important;
+			}
+			//bottom left
+			.#{nth($responsive, 3)}\:bl-radius-#{nth($radius, 1)} {
+				border-bottom-left-radius: nth($radius, 2) !important;
+			}
+			//bottom right
+			.#{nth($responsive, 3)}\:br-radius-#{nth($radius, 1)} {
+				border-bottom-left-radius: nth($radius, 2) !important;
+			}
+		}
+	}
+}
+
+.table-dpBlue-bg {
+	background-color: $blue-lighten7 !important;
+}
+
+.rounded-circle {
+	width: 20px; // You can adjust the width and height based on your requirements
+	height: 20px;
+	border-radius: 50%; // This will create a circle by setting the border-radius to 50%
+	overflow: hidden; // This ensures that the content inside the circle won't overflow
+}
+
+.rounded-circle-10 {
+	width: 10px; // You can adjust the width and height based on your requirements
+	height: 10px;
+	border-radius: 50%; // This will create a circle by setting the border-radius to 50%
+	overflow: hidden; // This ensures that the content inside the circle won't overflow
+}
+
+.user-oval-24 {
+	min-width: 24px;
+	min-height: 24px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.user-oval-32 {
+	min-width: 32px;
+	min-height: 32px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.user-oval-16 {
+	min-width: 16px;
+	min-height: 16px;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+/* Text truncate */
+.text-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+p,
+span {
+	&.sub-details {
+		@include font(13px, 18px, 400, $text-grey-secondary);
+	}
+}
+
+.table-hover:hover {
+	.table-cell {
+		background-color: #f5f7fa;
+		.sticky-left {
+			background-color: #f5f7fa !important;
+		}
+	}
+}
+
+.select-record {
+	.table-cell {
+		background-color: #eff8ff;
+		.sticky-left {
+			background-color: #eff8ff !important;
+		}
+	}
+}
+
+.text-trim {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gap-1 {
+	gap: 1em;
+}
+
+.gap-0-5 {
+	gap: 0.5em;
+}
+
+.translate-50 {
+	transform: translate(-50%, -50%);
+}
+
+/* Scroll bar grey */
+.scrollbar-grey {
+	&::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	/* Track */
+	&::-webkit-scrollbar-track {
+		background: $grey-lighten1;
+		border-radius: 10px;
+	}
+
+	/* Handle */
+	&::-webkit-scrollbar-thumb {
+		background: $grey-darken2;
+		border-radius: 10px;
+	}
+
+	/* Handle on hover */
+	&::-webkit-scrollbar-thumb:hover {
+		background: $grey-darken1;
+	}
+}
+
+.scrollbar-hidden {
+	// Chrome, Safari and Opera
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.border-radius-large {
+	border-radius: 8px !important;
+}
+
+.border-radius-small {
+	border-radius: 2px !important;
+}
+
+.border-radius-right-16 {
+	border-radius: 0 16px 16px 0 !important;
+}
+
+.m-x-l-auto {
+	margin-left: 3.125rem;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.sticky-top {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	&-60 {
+		position: sticky;
+		top: 60px;
+		z-index: 10;
+	}
+	&.z-0 {
+		z-index: 0;
+	}
+}
+
+.sticky-bottom {
+	position: sticky;
+	bottom: 0;
+	z-index: 10;
+	&-60 {
+		position: sticky;
+		top: 60px;
+		z-index: 10;
+	}
+}
+
+.sticky-left {
+	position: sticky;
+	left: 0;
+	z-index: 9;
+	background-color: #ffffff;
+}
+
+.app-loader {
+	height: calc(100vh - 330px);
+	&.associate-height {
+		height: calc(100vh - 750px) !important;
+	}
+	&.template-height {
+		height: calc(100vh - 508px) !important;
+	}
+	&.team-loader {
+		height: calc(100vh - 510px);
+	}
+	z-index: 30001;
+	opacity: 0.8;
+	.loader {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+}
+
+.margin-minus {
+	margin: 0 -12px;
+}
+
+/* Text wrap style here */
+.text-wrap {
+	word-break: break-all !important;
+}
+.space-pre-wrap {
+	white-space: pre-wrap;
+}
+.word-break-word {
+	word-break: break-word !important;
+}
+.word-break-keep {
+	word-break: keep-all !important;
+}
+.space-pre-no-wrap {
+	white-space: nowrap !important;
+}
+
+.border-none {
+	border: none;
+}
+
+.border-bottom-none {
+	border-bottom: none !important;
+}
+.border-top-none {
+	border-top: none !important;
+}
+
+.border-left-none {
+	border-left: none !important;
+}
+
+.border-right-none {
+	border-right: none !important;
+}
+
+.top-0 {
+	top: 0px !important;
+}
+
+.top-50 {
+	top: 50% !important;
+}
+
+.left-50 {
+	left: 50% !important;
+}
+
+.top-10px {
+	top: 10px;
+}
+
+.top--25px {
+	top: -25px;
+}
+
+.top-45px {
+	top: 45px;
+}
+
+.left-0 {
+	left: 0px;
+}
+
+.left-60px {
+	left: 60px;
+}
+
+.bottom-0 {
+	bottom: 0px;
+}
+
+.icon-hover {
+	@include size(30px);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		background-color: rgba($grey-lighten1, 0.4);
+	}
+
+	&.small {
+		@include size(unset);
+		padding: $spacer4;
+	}
+}
+
+.company-name-tag {
+	background-color: $orange-lighten3;
+	p {
+		color: $orange-darken1 !important;
+	}
+}
+
+.body-container-record-drawer {
+	height: 100% !important;
+	overflow: auto;
+
+	&.details-container {
+		height: calc(100vh - 120px) !important;
+	}
+}
+
+/* Table dp class here */
+.table-dpBlue {
+	color: $blue-darken6 !important;
+}
+
+.table-dpBlue-bg {
+	background-color: $blue-lighten7 !important;
+}
+
+.table-dpViolet {
+	color: $blue-darken7 !important;
+}
+
+.table-dpViolet-bg {
+	background-color: $blue-lighten8 !important;
+}
+
+.table-dpRed {
+	color: $red-darken1 !important;
+}
+
+.table-dpRed-bg {
+	background-color: $red-lighten4 !important;
+}
+
+.table-dpGreen {
+	color: $green-darken1 !important;
+}
+
+.table-dpGreen-bg {
+	background-color: $green-lighten3 !important;
+}
+
+// hide and show while hover
+.hover-show-container {
+	.show-element {
+		display: none;
+	}
+
+	&:hover {
+		.show-element {
+			display: flex;
+		}
+
+		.hover-hide-element {
+			display: none;
+		}
+	}
+}
+
+.search-mapdataset {
+	box-shadow: 0px 10px 15px -3px rgba(32, 42, 54, 0.1);
+}
+
+.multi-line-style {
+	word-wrap: break-word;
+	white-space: normal;
+}
+
+.note-details-container {
+	overflow: auto;
+	height: calc(100vh - 200px) !important;
+}
