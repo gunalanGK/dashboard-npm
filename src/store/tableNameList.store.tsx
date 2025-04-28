@@ -3,7 +3,7 @@ import { devtools } from "zustand/middleware";
 
 interface TableNameStoreData {
   loading: boolean;
-  tableName: string[] | null;
+  tableName: any[] | null;
   error: string | null;
   updateLoading: () => void;
   tableNameData: (newDbdata: unknown) => void;
@@ -17,7 +17,7 @@ export const useTableNameStore = create<TableNameStoreData>()(
     error: null,
     updateLoading: () =>
       set((state: TableNameStoreData) => ({ ...state, loading: true })),
-    tableNameData: (newTableName: string[]) =>
+    tableNameData: (newTableName: any[]) =>
       set((state: TableNameStoreData) => ({
         ...state,
         tableName: newTableName,

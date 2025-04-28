@@ -1,6 +1,6 @@
 interface TableNameStoreData {
     loading: boolean;
-    tableName: string[] | null;
+    tableName: any[] | null;
     error: string | null;
     updateLoading: () => void;
     tableNameData: (newDbdata: unknown) => void;

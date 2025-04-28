@@ -12,10 +12,12 @@ const ConnectDatasourccePage = ({
   payload,
   acceptedUserData,
   workspaceId,
+  userName,
 }: {
   payload: any;
   acceptedUserData: any;
   workspaceId: any;
+  userName: string;
 }) => {
   //  connectDatasource modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +42,8 @@ const ConnectDatasourccePage = ({
       <DashboardDetailsPage
         acceptedUserData={acceptedUserData}
         columnData={columnData}
+        workspaceId={workspaceId}
+        userName={userName}
       />
     </div>
   ) : (

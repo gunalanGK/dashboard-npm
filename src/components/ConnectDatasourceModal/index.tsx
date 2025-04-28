@@ -16,6 +16,7 @@ import { useDatabaseStore } from "@/store/database.store";
 import { useDashboardStore } from "@/store/dashboardState.store";
 import { clientApiGetCall } from "@/services/api/api.service";
 import { useTaskDataStore } from "@/store/taskStore";
+import { useTableNameStore } from "@/store/tableNameList.store";
 
 const ConnectDatasourceModal = ({
   workspaceId,
@@ -32,11 +33,12 @@ const ConnectDatasourceModal = ({
 
   const { setColumnData } = useDashboardStore();
   const { updateTaskData, updateError, taskData } = useTaskDataStore();
-  console.log("selectedValues", selectedValues);
+
+  const { tableNameData } = useTableNameStore();
 
   const getTablesName = async () => {
     const tables = await fetchTableNames();
-
+    tableNameData(tables);
     setTableDetails(tables);
   };
 
@@ -74,9 +76,7 @@ const ConnectDatasourceModal = ({
         workId: selectedValues,
       });
 
-      console.log("response.data", response.data);
-
-      if (response.data.error) {
+      if (response?.data?.error) {
         updateError(response.data.error);
       } else {
         updateTaskData(response.data.data);

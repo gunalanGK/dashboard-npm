@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export const getCookie = (name: string): [string, string] => {
   if (typeof window !== "undefined") {
     const { cookie } = document;
@@ -50,4 +52,24 @@ export const setCookie = (name: string, cvalue: string, exdays: number) => {
     `;domain=.` +
     process.env.NEXT_PUBLIC_DOMAIN +
     ";path=/";
+};
+
+export const isDateTodayOrFuture = (dateString: string) => {
+  const inputDate = DateTime.fromFormat(dateString, "d MMM yyyy").endOf("day");
+
+  const today = DateTime.now().startOf("day");
+
+  return inputDate < today;
+};
+
+export const getDateForTask = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const monthAbbreviation = new Intl.DateTimeFormat("en", {
+    month: "short",
+  }).format(date);
+  const year = date.getFullYear();
+
+  const formattedDate = `${day} ${monthAbbreviation} ${year}`;
+  return formattedDate;
 };

@@ -8,6 +8,7 @@ interface TaskDataStoreData {
   updateLoading: () => void;
   updateTaskData: (data: any) => void;
   updateError: (error: string) => void;
+  updateTaskDoneById: (payload: { id: string; done: boolean }) => void;
 }
 
 export const useTaskDataStore = create<TaskDataStoreData>()(
@@ -22,6 +23,13 @@ export const useTaskDataStore = create<TaskDataStoreData>()(
         ...state,
         loading: false,
         taskData: data,
+      })),
+    updateTaskDoneById: (payload: { id: string; done: boolean }) =>
+      set((state: TaskDataStoreData) => ({
+        ...state,
+        taskData: state.taskData?.map((task) =>
+          task.id === payload.id ? { ...task, completed: payload.done } : task
+        ),
       })),
     updateError: (error: string) =>
       set((state: TaskDataStoreData) => ({ ...state, loading: false, error })),
