@@ -1,6 +1,5 @@
 import { getGreeting } from "@/services/helper/service";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-
 import InsertCommentOutlinedIcon from "@mui/icons-material/InsertCommentOutlined";
 import { useEffect, useState } from "react";
 import { clientApiGetCall } from "@/services/api/api.service";
@@ -8,6 +7,9 @@ import { useTaskDataStore } from "@/store/taskStore";
 import DoughnutChartComponent from "@/components/DoughnutChart";
 import BarChartComponent from "@/components/BarChart";
 import { apiClient } from "@/services/api/api";
+import HistogramChartComponent from "@/components/HistogramChart";
+import PieChartComponent from "@/components/PieChart";
+import LineChartComponent from "@/components/LineChart";
 
 const DashboardDetailsPage = ({
   acceptedUserData,
@@ -110,7 +112,7 @@ const DashboardDetailsPage = ({
       </div>
 
       <div className="h-822px d-flex gap-16">
-        <div className="flex-1">
+        <div className="flex-1 d-flex flex-column gap-16">
           <div className="d-flex gap-16">
             <div className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1">
               <div className="h-56px d-flex align-center justify-between p-12">
@@ -134,7 +136,7 @@ const DashboardDetailsPage = ({
                 </div>
                 <MoreHorizIcon />
               </div>
-              <div>
+              <div className="flex-1 d-flex align-center justify-center p-12">
                 <BarChartComponent
                   key={columnData?.plotData[1]?.plot_name}
                   tableData={columnData?.plotData[1]?.data}
@@ -143,7 +145,54 @@ const DashboardDetailsPage = ({
             </div>
           </div>
 
-          <div></div>
+          <div className="d-flex gap-16">
+            <div className="h-388px flex-1 radius-8 border-solid-border-1">
+              <div className="h-56px d-flex align-center justify-between p-12">
+                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                  {columnData?.plotData[2]?.plot_name}
+                </div>
+                <MoreHorizIcon />
+              </div>
+              <div className="flex-1 d-flex align-center justify-center p-12">
+                <HistogramChartComponent
+                  key={columnData?.plotData[2]?.plot_name}
+                  tableData={columnData?.plotData[2]?.data}
+                />
+              </div>
+            </div>
+
+            <div className="h-388px flex-1 radius-8 border-solid-border-1">
+              <div className="h-56px d-flex align-center justify-between p-12">
+                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                  {columnData?.plotData[3]?.plot_name}
+                </div>
+                <MoreHorizIcon />
+              </div>
+              <div className="flex-1 d-flex align-center justify-center p-12">
+                <PieChartComponent
+                  key={columnData?.plotData[3]?.plot_name}
+                  tableData={columnData?.plotData[3]?.data}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="d-flex gap-16">
+            <div className="h-388px flex-1 radius-8 border-solid-border-1">
+              <div className="h-56px d-flex align-center justify-between p-12">
+                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                  {columnData?.plotData[4]?.plot_name}
+                </div>
+                <MoreHorizIcon />
+              </div>
+              <div className="flex-1 d-flex align-center justify-center p-12">
+                <LineChartComponent
+                  key={columnData?.plotData[4]?.plot_name}
+                  tableData={columnData?.plotData[4]?.data}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="maxh-822px w-354px border-solid-task-dashboard-border radius-8 d-flex flex-column ">

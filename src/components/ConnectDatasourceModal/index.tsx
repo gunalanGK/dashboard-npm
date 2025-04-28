@@ -36,7 +36,6 @@ const ConnectDatasourceModal = ({
 
   const getTablesName = async () => {
     const tables = await fetchTableNames();
-
     setTableDetails(tables);
   };
 

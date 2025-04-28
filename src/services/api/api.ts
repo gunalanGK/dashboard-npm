@@ -46,7 +46,7 @@ export const fetchTableColumnDataTypes = async (selectedTables: string[]) => {
 
   try {
     const response = await apiClient.get(
-      `/upload/table-column-datatypes?${queryString}`
+      `/upload/plot-data?${queryString}`
     );
     return response.data;
   } catch (error) {
