@@ -1,6 +1,6 @@
 import React from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
-import LineChartComponent from "../../components/LineChart";
+import LineChartComponent from "../../components/AreaChart";
 import ScatterPlotComponent from "../../components/ScatterChart";
 import BarChartComponent from "../../components/BarChart";
 import HistogramChartComponent from "../../components/HistogramChart";

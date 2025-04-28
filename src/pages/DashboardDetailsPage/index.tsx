@@ -9,7 +9,8 @@ import BarChartComponent from "@/components/BarChart";
 import { apiClient } from "@/services/api/api";
 import HistogramChartComponent from "@/components/HistogramChart";
 import PieChartComponent from "@/components/PieChart";
-import LineChartComponent from "@/components/LineChart";
+import LineChartComponent from "@/components/AreaChart";
+import AreaChartComponent from "@/components/LineChart";
 
 const DashboardDetailsPage = ({
   acceptedUserData,
@@ -160,18 +161,17 @@ const DashboardDetailsPage = ({
                 />
               </div>
             </div>
-
             <div className="h-388px flex-1 radius-8 border-solid-border-1">
               <div className="h-56px d-flex align-center justify-between p-12">
                 <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[3]?.plot_name}
+                  {columnData?.plotData[4]?.plot_name}
                 </div>
                 <MoreHorizIcon />
               </div>
               <div className="flex-1 d-flex align-center justify-center p-12">
-                <PieChartComponent
-                  key={columnData?.plotData[3]?.plot_name}
-                  tableData={columnData?.plotData[3]?.data}
+                <LineChartComponent
+                  key={columnData?.plotData[4]?.plot_name}
+                  tableData={columnData?.plotData[4]?.data}
                 />
               </div>
             </div>
@@ -186,9 +186,24 @@ const DashboardDetailsPage = ({
                 <MoreHorizIcon />
               </div>
               <div className="flex-1 d-flex align-center justify-center p-12">
-                <LineChartComponent
+                <AreaChartComponent
                   key={columnData?.plotData[4]?.plot_name}
                   tableData={columnData?.plotData[4]?.data}
+                />
+              </div>
+            </div>
+
+            <div className="h-388px flex-1 radius-8 border-solid-border-1">
+              <div className="h-56px d-flex align-center justify-between p-12">
+                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                  {columnData?.plotData[3]?.plot_name}
+                </div>
+                <MoreHorizIcon />
+              </div>
+              <div className="flex-1 d-flex align-center justify-center p-12">
+                <PieChartComponent
+                  key={columnData?.plotData[3]?.plot_name}
+                  tableData={columnData?.plotData[3]?.data}
                 />
               </div>
             </div>

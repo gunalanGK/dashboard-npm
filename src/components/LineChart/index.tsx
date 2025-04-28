@@ -17,7 +17,7 @@ interface LineChartProps {
 
 const LineChart: React.FC<LineChartProps> = ({
   data,
-  width = 1000,
+  width = 500,
   height = 300,
   xLabel = "",
   yLabel = "",
@@ -86,7 +86,20 @@ const LineChart: React.FC<LineChartProps> = ({
       .attr("stroke", "#e0e0e0")
       .attr("stroke-dasharray", "2,2");
 
-    g.select(".grid path").attr("stroke", "none");
+    g.append("g")
+      .attr("class", "grid")
+      .call(
+        d3
+          .axisBottom(xScale)
+          .ticks(5)
+          .tickSize(innerHeight)
+          .tickFormat(() => "")
+      )
+      .selectAll("line")
+      .attr("stroke", "#e0e0e0")
+      .attr("stroke-dasharray", "2,2");
+
+    g.selectAll(".grid path").attr("stroke", "none");
 
     g.append("g")
       .attr("class", "x-axis")
@@ -137,17 +150,17 @@ const LineChart: React.FC<LineChartProps> = ({
       .x((d) => (isXDate ? xScale(new Date(d.x as string)) : xScale(+d.x)))
       .y0(innerHeight)
       .y1((d) => yScale(d.y))
-      .curve(d3.curveMonotoneX);
+      .curve(d3.curveLinear);
 
     const line = d3
       .line<DataPoint>()
       .x((d) => (isXDate ? xScale(new Date(d.x as string)) : xScale(+d.x)))
       .y((d) => yScale(d.y))
-      .curve(d3.curveMonotoneX);
+      .curve(d3.curveLinear);
 
     g.append("path")
       .datum(sortedData)
-      .attr("fill", " #FFE5B4")
+      .attr("fill", "transparent")
       .attr("opacity", "0.5")
       .attr("d", area);
 
@@ -155,7 +168,7 @@ const LineChart: React.FC<LineChartProps> = ({
       .datum(sortedData)
       .attr("class", "line")
       .attr("fill", "none")
-      .attr("stroke", "#f59e0b")
+      .attr("stroke", "#EC8D71")
       .attr("stroke-width", 2)
       .attr("d", line);
 
@@ -169,8 +182,8 @@ const LineChart: React.FC<LineChartProps> = ({
       )
       .attr("cy", (d) => yScale(d.y))
       .attr("r", 4)
-      .attr("fill", "#f59e0b")
-      .attr("stroke", "#fff")
+      .attr("fill", "transparent")
+      .attr("stroke", "#EC8D71")
       .attr("stroke-width", 1.5);
 
     const tooltip = d3
@@ -188,7 +201,7 @@ const LineChart: React.FC<LineChartProps> = ({
 
     g.selectAll<SVGCircleElement, DataPoint>(".data-point")
       .on("mouseover", function (event: MouseEvent, d: DataPoint) {
-        d3.select(this).attr("r", 6).attr("fill", "#f59e0b");
+        d3.select(this).attr("r", 6).attr("fill", "#EC8D71");
 
         tooltip
           .style("opacity", 1)
@@ -203,7 +216,7 @@ const LineChart: React.FC<LineChartProps> = ({
           .style("top", `${event.pageY - 28}px`);
       })
       .on("mouseout", function () {
-        d3.select(this).attr("r", 4).attr("fill", "#f59e0b");
+        d3.select(this).attr("r", 4).attr("fill", "transparent");
         tooltip.style("opacity", 0);
       });
 
@@ -245,7 +258,7 @@ const LineChartComponent: React.FC<TableDataProps> = ({ tableData }) => {
   }));
 
   return (
-    <div className="w-full p-4 border rounded shadow-md bg-white">
+    <div className="w-full">
       <LineChart
         data={formattedData}
         xLabel={tableData.xLabel || ""}
