@@ -20,23 +20,39 @@ const DashboardDetailsPage = ({
   columnData: any;
 }) => {
   const { taskData } = useTaskDataStore();
-  const [cardData, setcardData] = useState([]);
+  const [cardData, setCardData] = useState([]);
+  const [plotDatasets, setPlotDatasets] = useState<any[]>([]);
 
-  const getCoardData = async () => {
-    const response = await apiClient.post(`/get-data/metrics`, [
-      ...columnData.DataCards,
-    ]);
-
-    if (response.data) {
-      console.log("response.data", response.data);
-
-      setcardData(response.data);
+  const fetchDashboardData = async () => {
+    try {
+      const cardResponse = await apiClient.post(`/get-data/metrics`, [
+        ...columnData.DataCards,
+      ]);
+      if (cardResponse.data) {
+        setCardData(cardResponse.data);
+      }
+      const plotDetails = columnData.plotData.map(async (plot: any) => {
+        const response = await apiClient.get(
+          `/get-data/xy-data?${plot.params}`
+        );
+        return {
+          plot_name: plot.plot_name,
+          plot_type: plot.plot_type,
+          data: response.data,
+        };
+      });
+      const PlotsData = await Promise.all(plotDetails);
+      setPlotDatasets(PlotsData);
+    } catch (error) {
+      console.error("Error fetching dashboard data", error);
     }
   };
 
   useEffect(() => {
-    getCoardData();
-  }, [columnData.metrics]);
+    if (columnData?.metrics || columnData?.plotData) {
+      fetchDashboardData();
+    }
+  }, [columnData]);
 
   const getAssignTo = (assignTo: string[]) => {
     console.log("assignTo", acceptedUserData);
@@ -82,6 +98,25 @@ const DashboardDetailsPage = ({
     return formatted;
   };
 
+  const renderChart = (plot: any) => {
+    switch (plot.plot_type) {
+      case "doughnut":
+        return <DoughnutChartComponent tableData={plot.data} />;
+      case "bar":
+        return <BarChartComponent tableData={plot.data} />;
+      case "histogram":
+        return <HistogramChartComponent tableData={plot.data} />;
+      case "pie":
+        return <PieChartComponent tableData={plot.data} />;
+      case "line":
+        return <LineChartComponent tableData={plot.data} />;
+      case "area":
+        return <AreaChartComponent tableData={plot.data} />;
+      default:
+        return <div>Unsupported Plot</div>;
+    }
+  };
+
   return (
     <>
       <div className="d-flex mb-8">
@@ -114,110 +149,44 @@ const DashboardDetailsPage = ({
 
       <div className="h-822px d-flex gap-16">
         <div className="flex-1 d-flex flex-column gap-16">
-          <div className="d-flex gap-16">
-            <div className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[0]?.plot_name}
-                </div>
-                <MoreHorizIcon />
+          {Array.from(
+            { length: Math.ceil(plotDatasets.length / 2) },
+            (_, rowIdx) => (
+              <div key={rowIdx} className="d-flex gap-16">
+                {plotDatasets
+                  .slice(rowIdx * 2, rowIdx * 2 + 2)
+                  .map((plot, idx) => (
+                    <div
+                      key={idx}
+                      className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1"
+                    >
+                      <div className="h-56px d-flex align-center justify-between p-12">
+                        <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                          {plot.plot_name}
+                        </div>
+                        <MoreHorizIcon />
+                      </div>
+                      <div className="flex-1 d-flex justify-center align-center p-12">
+                        {renderChart(plot)}
+                      </div>
+                    </div>
+                  ))}
               </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <DoughnutChartComponent
-                  key={columnData?.plotData[0]?.plot_name}
-                  tableData={columnData?.plotData[0]?.data}
-                />
-              </div>
-            </div>
-
-            <div className="h-388px flex-1 radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[1]?.plot_name}
-                </div>
-                <MoreHorizIcon />
-              </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <BarChartComponent
-                  key={columnData?.plotData[1]?.plot_name}
-                  tableData={columnData?.plotData[1]?.data}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="d-flex gap-16">
-            <div className="h-388px flex-1 radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[2]?.plot_name}
-                </div>
-                <MoreHorizIcon />
-              </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <HistogramChartComponent
-                  key={columnData?.plotData[2]?.plot_name}
-                  tableData={columnData?.plotData[2]?.data}
-                />
-              </div>
-            </div>
-            <div className="h-388px flex-1 radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[4]?.plot_name}
-                </div>
-                <MoreHorizIcon />
-              </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <LineChartComponent
-                  key={columnData?.plotData[4]?.plot_name}
-                  tableData={columnData?.plotData[4]?.data}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="d-flex gap-16">
-            <div className="h-388px flex-1 radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[4]?.plot_name}
-                </div>
-                <MoreHorizIcon />
-              </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <AreaChartComponent
-                  key={columnData?.plotData[4]?.plot_name}
-                  tableData={columnData?.plotData[4]?.data}
-                />
-              </div>
-            </div>
-
-            <div className="h-388px flex-1 radius-8 border-solid-border-1">
-              <div className="h-56px d-flex align-center justify-between p-12">
-                <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                  {columnData?.plotData[3]?.plot_name}
-                </div>
-                <MoreHorizIcon />
-              </div>
-              <div className="flex-1 d-flex align-center justify-center p-12">
-                <PieChartComponent
-                  key={columnData?.plotData[3]?.plot_name}
-                  tableData={columnData?.plotData[3]?.data}
-                />
-              </div>
-            </div>
-          </div>
+            )
+          )}
         </div>
 
-        <div className="maxh-822px w-354px border-solid-task-dashboard-border radius-8 d-flex flex-column ">
-          <div className="h-42px p-12  d-flex justify-between align-center">
+        <div className="maxh-822px w-354px border-solid-task-dashboard-border radius-8 d-flex flex-column">
+          <div className="h-42px p-12 d-flex justify-between align-center">
             <div className="f-w-600 f-16 txt-task-color">Task</div>
             <div>image</div>
           </div>
           <div className="bg-bg-task maxh-772px p-12 flex-1 overflow-auto">
-            {taskData?.map((task) => (
-              <div className="maxh-176px p-16 mb-10 bg-white radius-8">
+            {taskData?.map((task, idx) => (
+              <div
+                key={idx}
+                className="maxh-176px p-16 mb-10 bg-white radius-8"
+              >
                 <div className="d-flex">
                   <div className="mr-8">
                     {task?.completed ? (

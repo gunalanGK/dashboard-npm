@@ -22,7 +22,7 @@ const PieChart: React.FC<{
   data: DataPoint[];
   width?: number;
   height?: number;
-}> = ({ data, width = 400, height = 350 }) => {
+}> = ({ data, width = 500, height = 350 }) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const margin = 20;
   const radius = Math.min(width, height) / 2 - margin;

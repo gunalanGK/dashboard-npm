@@ -23,7 +23,7 @@ const DoughnutChart: React.FC<{
   data: DataPoint[];
   width?: number;
   height?: number;
-}> = ({ data, width = 400, height = 350 }) => {
+}> = ({ data, width = 500, height = 350 }) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const margin = 20;
   const radius = Math.min(width, height) / 2 - margin;
@@ -79,8 +79,8 @@ const DoughnutChart: React.FC<{
       .attr("class", "main-arc")
       .attr("d", function(d) { return arc(d as d3.PieArcDatum<DataPoint>); })
       .attr("fill", (d) => color(String(d.data.category)))
-      .attr("stroke", "#fff")
-      .style("stroke-width", "2px")
+      .attr("stroke", "none")
+      .style("stroke-width", "0px")
       .style("opacity", 0.9);
 
     segments.append("path")
@@ -96,7 +96,7 @@ const DoughnutChart: React.FC<{
         const baseColor = color(String(d.data.category));
         const fadedColor = d3.color(baseColor)?.copy();
         if (fadedColor) {
-          fadedColor.opacity = 0.6; 
+          fadedColor.opacity = 0.5; 
         }
         return fadedColor?.toString() || baseColor;
       })
@@ -140,7 +140,7 @@ const DoughnutChart: React.FC<{
         d3.select(this).select(".main-arc")
           .transition()
           .duration(200)
-          .attr("stroke", "#fff");
+          .attr("stroke", "#none");
       });
   }, [data, width, height]);
 
