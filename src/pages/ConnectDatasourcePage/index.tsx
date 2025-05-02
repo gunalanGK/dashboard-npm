@@ -6,6 +6,14 @@ import { useDashboardStore } from "@/store/dashboardState.store";
 import DashboardCharts from "../Dashboard/DashboardCharts";
 import DashboardPage from "@/DashboardPage";
 import DashboardDetailsPage from "../DashboardDetailsPage";
+import { clientApiGetCall } from "@/services/api/api.service";
+import { useDashboardTemplateStore } from "@/store/dashboardTemplate.store";
+import {
+  fetchDashboardTemplate,
+  fetchTableColumnDataTypes,
+} from "@/services/api/api";
+import { DashboardTemplate } from "@/utils/constants/dashboardTemplate";
+import { useTaskDataStore } from "@/store/taskStore";
 
 // need to update the type
 const ConnectDatasourccePage = ({
@@ -22,15 +30,57 @@ const ConnectDatasourccePage = ({
   //  connectDatasource modal
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { columnData } = useDashboardStore();
+  const { columnData, setColumnData } = useDashboardStore();
+  const { dashboardTemplateList, updateDashboardTemplateList, updateError } =
+    useDashboardTemplateStore();
+
+  const { updateSelectTable } = useTaskDataStore();
 
   const connectDB = async () => {
     await connectToDatabase(payload);
   };
 
+  const getDashboardTemplateList = async () => {
+    try {
+      const dashboardTemplateList = await clientApiGetCall(
+        `workspace/${workspaceId}/dataset/dashboard-template`
+      );
+
+      updateDashboardTemplateList(dashboardTemplateList?.data?.data);
+    } catch (err) {
+      updateError("error");
+    }
+  };
+
+  const connectAndGetTemplate = async () => {
+    await connectDB();
+    await getDashboardTemplateList();
+  };
+
   useEffect(() => {
-    connectDB();
+    connectAndGetTemplate();
   }, [payload]);
+
+  const getColumnData = async () => {
+    if (dashboardTemplateList?.length) {
+      const dashboardTemplateData = dashboardTemplateList[0];
+
+      if (dashboardTemplateData && dashboardTemplateData["template-type"]) {
+        const data = await fetchDashboardTemplate(
+          dashboardTemplateData.workspace_ids?.split(","),
+          dashboardTemplateData["template-type"]
+        );
+        setColumnData(data);
+        updateSelectTable(dashboardTemplateData.workspace_ids?.split(","));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (dashboardTemplateList?.length) {
+      getColumnData();
+    }
+  }, [dashboardTemplateList]);
 
   const closeModal = () => {
     setIsModalOpen(false);

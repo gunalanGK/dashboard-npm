@@ -5,10 +5,12 @@ interface TaskDataStoreData {
   loading: boolean;
   taskData: any[];
   error: string | null;
+  selectTable: string[];
   updateLoading: () => void;
   updateTaskData: (data: any) => void;
   updateError: (error: string) => void;
   updateTaskDoneById: (payload: { id: string; done: boolean }) => void;
+  updateSelectTable: (selectTable: string[]) => void;
 }
 
 export const useTaskDataStore = create<TaskDataStoreData>()(
@@ -16,6 +18,9 @@ export const useTaskDataStore = create<TaskDataStoreData>()(
     loading: false,
     error: null,
     taskData: [],
+    selectTable: [],
+    updateSelectTable: (data: string[]) =>
+      set((state: TaskDataStoreData) => ({ ...state, selectTable: data })),
     updateLoading: () =>
       set((state: TaskDataStoreData) => ({ ...state, loading: true })),
     updateTaskData: (data: any) =>

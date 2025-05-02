@@ -11,13 +11,14 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-
     const getAccessToken = () => {
       const cookieKeys = Object.keys(cookies.getAll());
-      const accessTokenKey = cookieKeys.find(key => key.endsWith("accessToken"));
+      const accessTokenKey = cookieKeys.find((key) =>
+        key.endsWith("accessToken")
+      );
       return accessTokenKey ? cookies.get(accessTokenKey) : null;
     };
-    
+
     const accessToken = getAccessToken();
 
     const tenantId = cookies.get("workspaceId");
@@ -45,8 +46,29 @@ export const fetchTableColumnDataTypes = async (selectedTables: string[]) => {
     .join("&");
 
   try {
+    const response = await apiClient.get(`/upload/plot-data?${queryString}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch table column data types:", error);
+    throw error;
+  }
+};
+
+export const fetchDashboardTemplate = async (
+  selectedTables: string[],
+  templateName: string
+) => {
+  if (selectedTables.length === 0) return null;
+
+  const queryString = selectedTables
+    .map((table) => `tables=${encodeURIComponent(table)}`)
+    .join("&");
+
+  try {
     const response = await apiClient.get(
-      `/upload/table-column-datatypes?${queryString}`
+      `/upload/dashboard-template?${queryString}&templateName=${encodeURIComponent(
+        templateName
+      )}`
     );
     return response.data;
   } catch (error) {

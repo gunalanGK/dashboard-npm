@@ -6,17 +6,29 @@ type DataPoint = {
   value: number;
 };
 
-const generateColorPalette = (numColors: number): string[] => {
-  return Array.from({ length: numColors }, (_, i) =>
-    d3.interpolateRainbow(i / numColors)
-  );
-};
+const customPalette = [
+  "#80cbc4",
+  "#ef5350",
+  "#ff8a65",
+  "#ffd54f",
+  "#fdd835",
+  "#aed581",
+  "#ba68c8",
+  "#4fc3f7",
+];
+
+const fallbackPalette = d3.schemeSet2;
+
+const combinedPalette = [
+  ...customPalette,
+  ...fallbackPalette.slice(customPalette.length),
+];
 
 const DoughnutChart: React.FC<{
   data: DataPoint[];
   width?: number;
   height?: number;
-}> = ({ data, width = 400, height = 350 }) => {
+}> = ({ data, width = 500, height = 350 }) => {
   const ref = useRef<SVGSVGElement | null>(null);
   const margin = 20;
   const radius = Math.min(width, height) / 2 - margin;
@@ -28,12 +40,12 @@ const DoughnutChart: React.FC<{
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
 
-    const colors = generateColorPalette(data.length);
+    // const colors = generateColorPalette(data.length);
 
     const color = d3
       .scaleOrdinal<string, string>()
       .domain(data.map((d) => String(d.category)))
-      .range(colors);
+      .range(combinedPalette);
 
     const pie = d3.pie<DataPoint>().value((d) => d.value);
     const data_ready = pie(data);
@@ -62,15 +74,46 @@ const DoughnutChart: React.FC<{
       .style("opacity", 0)
       .style("pointer-events", "none");
 
-    g.selectAll("path")
+    const segments = g
+      .selectAll(".segment")
       .data(data_ready)
       .enter()
+      .append("g")
+      .attr("class", "segment");
+
+    segments
       .append("path")
-      .attr("d", arc)
+      .attr("class", "main-arc")
+      .attr("d", function (d) {
+        return arc(d as d3.PieArcDatum<DataPoint>);
+      })
       .attr("fill", (d) => color(String(d.data.category)))
-      .attr("stroke", "#fff")
-      .style("stroke-width", "2px")
-      .style("opacity", 0.9)
+      .attr("stroke", "none")
+      .style("stroke-width", "0px")
+      .style("opacity", 0.9);
+
+    segments
+      .append("path")
+      .attr("class", "highlight-arc")
+      .attr("d", function (d) {
+        const highlightArc = d3
+          .arc<d3.PieArcDatum<DataPoint>>()
+          .innerRadius(radius)
+          .outerRadius(radius + 10);
+        return highlightArc(d as d3.PieArcDatum<DataPoint>);
+      })
+      .attr("fill", (d) => {
+        const baseColor = color(String(d.data.category));
+        const fadedColor = d3.color(baseColor)?.copy();
+        if (fadedColor) {
+          fadedColor.opacity = 0.5;
+        }
+        return fadedColor?.toString() || baseColor;
+      })
+      .attr("stroke", "none")
+      .style("opacity", 0);
+
+    segments
       .on("mouseover", function (event, d) {
         const percent = (
           (d.data.value / d3.sum(data, (d) => d.value)) *
@@ -83,7 +126,18 @@ const DoughnutChart: React.FC<{
           )
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 40 + "px");
-        d3.select(this).style("opacity", 1);
+
+        d3.select(this)
+          .select(".highlight-arc")
+          .transition()
+          .duration(200)
+          .style("opacity", 1);
+
+        d3.select(this)
+          .select(".main-arc")
+          .transition()
+          .duration(200)
+          .attr("stroke", "none");
       })
       .on("mousemove", function (event) {
         tooltip
@@ -92,7 +146,18 @@ const DoughnutChart: React.FC<{
       })
       .on("mouseout", function () {
         tooltip.style("opacity", 0);
-        d3.select(this).style("opacity", 0.9);
+
+        d3.select(this)
+          .select(".highlight-arc")
+          .transition()
+          .duration(200)
+          .style("opacity", 0);
+
+        d3.select(this)
+          .select(".main-arc")
+          .transition()
+          .duration(200)
+          .attr("stroke", "#none");
       });
   }, [data, width, height]);
 
@@ -118,12 +183,12 @@ const DoughnutChartComponent: React.FC<DoughnutChartComponentProps> = ({
     value: Number(tableData.y[index] ?? 0),
   }));
 
-  const colors = generateColorPalette(sampleData.length);
+  const colors = combinedPalette;
 
   return (
     <div className="d-flex flex-1">
       <div className="flex-2 d-flex justify-center">
-        <DoughnutChart data={sampleData} width={250} height={200} />
+        <DoughnutChart data={sampleData} width={260} height={260} />
       </div>
 
       <div className="ml-5 flex-1  d-flex gap-8 flex-column align-center overflow-auto justify-center">

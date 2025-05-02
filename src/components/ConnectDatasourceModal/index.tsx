@@ -17,6 +17,7 @@ import { useDashboardStore } from "@/store/dashboardState.store";
 import { clientApiGetCall } from "@/services/api/api.service";
 import { useTaskDataStore } from "@/store/taskStore";
 import { useTableNameStore } from "@/store/tableNameList.store";
+import { useDashboardTemplateStore } from "@/store/dashboardTemplate.store";
 
 const ConnectDatasourceModal = ({
   workspaceId,
@@ -32,7 +33,8 @@ const ConnectDatasourceModal = ({
   const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
   const { setColumnData } = useDashboardStore();
-  const { updateTaskData, updateError, taskData } = useTaskDataStore();
+  const { updateTaskData, updateError, taskData, updateSelectTable } =
+    useTaskDataStore();
 
   const { tableNameData } = useTableNameStore();
 
@@ -43,7 +45,9 @@ const ConnectDatasourceModal = ({
   };
 
   useEffect(() => {
-    if (isOpen) getTablesName();
+    if (isOpen) {
+      getTablesName();
+    }
   }, [isOpen]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -64,10 +68,10 @@ const ConnectDatasourceModal = ({
 
   const getdashboardData = async () => {
     const data = await fetchTableColumnDataTypes(selectedValues);
-    console.log("selectedValues", selectedValues);
-    console.log("data", data);
 
     setColumnData(data);
+
+    updateSelectTable(selectedValues);
 
     try {
       const url = `workspace/${workspaceId}/datasets/engagement/task`;

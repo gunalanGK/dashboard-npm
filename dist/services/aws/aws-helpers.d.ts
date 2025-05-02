@@ -5,7 +5,7 @@ import { ResetPasswordOutput, UpdatePasswordInput } from 'aws-amplify/auth';
  * @param {UpdatePasswordInput} newPassword - The new password of the user.
  * @returns {Promise<void>} A Promise representing the completion of the password update operation.
  */
-export declare const handleUpdatePassword: ({ oldPassword, newPassword }: UpdatePasswordInput) => Promise<"success" | "error">;
+export declare const handleUpdatePassword: ({ oldPassword, newPassword }: UpdatePasswordInput) => Promise<"error" | "success">;
 /**
  * Function to handle next steps after resetting the password.
  * @param {ResetPasswordOutput} output - The output object from resetting the password.

@@ -23,9 +23,6 @@ export const connectToDatabase = async (payload: ConnectionPayload) => {
     const accessToken = getAccessToken();
 
     const tenantId = cookies.get("workspaceId");
-    
-    console.log("accessToken", accessToken);
-    console.log("tenantId", tenantId);
 
     if (!accessToken) {
       console.error("Missing access token. User must be logged in.");

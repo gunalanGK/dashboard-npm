@@ -12,6 +12,20 @@ interface BarChartProps {
   height?: number;
 }
 
+
+const customPalette = [
+  "#80cbc4", "#ef5350", "#ff8a65", "#ffd54f", "#fdd835", "#aed581",
+  "#ba68c8", 
+  "#4fc3f7",
+];
+
+const fallbackPalette = d3.schemeSet2;
+
+const combinedPalette = [
+  ...customPalette,
+  ...fallbackPalette.slice(customPalette.length)
+];
+
 const BarChart: React.FC<BarChartProps> = ({
   data,
   width = 500,
@@ -46,13 +60,23 @@ const BarChart: React.FC<BarChartProps> = ({
     const colors = d3
       .scaleOrdinal<string, string>()
       .domain(data.map((d) => d.category))
-      .range(d3.schemeSet2);
+      .range(combinedPalette);
 
     const chart = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-
-
+      
+      chart.append("g")
+      .attr("class", "grid")
+      .call(
+        d3.axisLeft(yScale)
+          .tickValues(yScale.ticks().filter(tick => Number.isInteger(tick))) 
+          .tickSize(-innerWidth)
+          .tickFormat(() => "")
+      )
+      .selectAll("line")
+      .attr("stroke", "#e5e7eb");
+    
     const yAxisG = chart
       .append("g")
       .call(
@@ -62,18 +86,18 @@ const BarChart: React.FC<BarChartProps> = ({
           .tickFormat(d3.format("d"))
       );
 
-    yAxisG
-      .selectAll("text")
-      .style("font-size", "12px");
+    yAxisG.selectAll("text").style("font-size", "12px");
+    yAxisG.selectAll("path.domain").attr("stroke", "#e5e7eb");
+    yAxisG.selectAll("line").attr("stroke", "#e5e7eb");
 
-
-    yAxisG
-      .selectAll("path.domain")
-      .attr("stroke", "#e5e7eb"); 
-     
-    yAxisG
-      .selectAll("line")
-      .attr("stroke", "#e5e7eb"); 
+    chart.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -innerHeight / 2)
+      .attr("y", -margin.left + 15)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#6b7280")
+      .style("font-size", "14px")
+      .text("Count");
 
     chart
       .append("g")
@@ -87,7 +111,6 @@ const BarChart: React.FC<BarChartProps> = ({
       .attr("transform", "rotate(0)")
       .style("text-anchor", "middle")
       .style("font-size", "12px");
-
 
     const tooltip = d3
       .select("body")
