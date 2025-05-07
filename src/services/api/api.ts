@@ -1,8 +1,10 @@
 import axios from "axios";
 import useAuthStore from "../../store/authStore";
 import Cookies from "universal-cookie";
+import Config from "@/config";
 
-const API_BASE_URL = "http://localhost:3006";
+const API_BASE_URL = Config.dynamicDashboardUrl;
+;
 
 const cookies = new Cookies();
 export const apiClient = axios.create({

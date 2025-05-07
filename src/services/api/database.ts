@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "universal-cookie";
+import Config from "@/config";
 
 export interface ConnectionPayload {
   host: string;
@@ -30,7 +31,7 @@ export const connectToDatabase = async (payload: ConnectionPayload) => {
     }
 
     const response = await axios.post(
-      "http://localhost:3006/database/connect",
+      `${Config.dynamicDashboardUrl}database/connect`,
       payload,
       {
         headers: {

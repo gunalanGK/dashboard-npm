@@ -10,13 +10,12 @@ interface BarChartProps {
   data: DataPoint[];
   width?: number;
   height?: number;
+  barWidth?: number;
 }
-
 
 const customPalette = [
   "#80cbc4", "#ef5350", "#ff8a65", "#ffd54f", "#fdd835", "#aed581",
-  "#ba68c8", 
-  "#4fc3f7",
+  "#ba68c8", "#4fc3f7",
 ];
 
 const fallbackPalette = d3.schemeSet2;
@@ -30,25 +29,34 @@ const BarChart: React.FC<BarChartProps> = ({
   data,
   width = 500,
   height = 300,
+  barWidth = 60,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-
+  
   useEffect(() => {
     if (!data || data.length === 0) return;
 
+
+    const barSpacing = 10;
+    const totalWidth = data.length * (barWidth + barSpacing);
+    const chartWidth = Math.max(width, totalWidth + margin.left + margin.right);
+    
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
-
+   
+    svg.attr("width", chartWidth);
+    
     const total = d3.sum(data, (d) => d.value);
-    const innerWidth = width - margin.left - margin.right;
+    const innerWidth = chartWidth - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
     const xScale = d3
       .scaleBand()
       .domain(data.map((d) => d.category))
-      .range([0, innerWidth])
-      .padding(0.2);
+      .range([0, totalWidth])
+      .padding(barSpacing / (barWidth + barSpacing)); 
 
     const yMax = d3.max(data, (d) => d.value) ?? 0;
     const yScale = d3
@@ -66,7 +74,8 @@ const BarChart: React.FC<BarChartProps> = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
       
-      chart.append("g")
+ 
+    chart.append("g")
       .attr("class", "grid")
       .call(
         d3.axisLeft(yScale)
@@ -77,12 +86,13 @@ const BarChart: React.FC<BarChartProps> = ({
       .selectAll("line")
       .attr("stroke", "#e5e7eb");
     
+
     const yAxisG = chart
       .append("g")
       .call(
         d3
           .axisLeft(yScale)
-          .ticks(Math.ceil(yMax))
+          .ticks(Math.min(Math.ceil(yMax), 5))
           .tickFormat(d3.format("d"))
       );
 
@@ -99,18 +109,20 @@ const BarChart: React.FC<BarChartProps> = ({
       .style("font-size", "14px")
       .text("Count");
 
-    chart
+
+    const xAxis = chart
       .append("g")
       .attr("transform", `translate(0,${innerHeight})`)
       .call(d3.axisBottom(xScale))
       .call((g) => {
         g.selectAll(".tick line").remove();
         g.select(".domain").attr("stroke", "#e5e7eb");
-      })
-      .selectAll("text")
-      .attr("transform", "rotate(0)")
+      });
+    
+    xAxis.selectAll("text")
       .style("text-anchor", "middle")
       .style("font-size", "12px");
+
 
     const tooltip = d3
       .select("body")
@@ -133,7 +145,7 @@ const BarChart: React.FC<BarChartProps> = ({
       .attr("class", "bar")
       .attr("x", (d) => xScale(d.category)!)
       .attr("y", (d) => yScale(d.value))
-      .attr("width", xScale.bandwidth())
+      .attr("width", barWidth)
       .attr("height", (d) => innerHeight - yScale(d.value))
       .attr("fill", (d) => colors(d.category))
       .on("mouseover", function (event, d) {
@@ -160,9 +172,21 @@ const BarChart: React.FC<BarChartProps> = ({
     return () => {
       tooltip.remove();
     };
-  }, [data, width, height]);
+  }, [data, width, height, barWidth]);
 
-  return <svg ref={svgRef} width={width} height={height} />;
+
+  return (
+    <div 
+      ref={containerRef}
+      style={{ 
+        width: `${width}px`, 
+        overflow: "auto",
+        position: "relative"
+      }}
+    >
+      <svg ref={svgRef} height={height} />
+    </div>
+  );
 };
 
 interface BarChartComponentProps {
@@ -175,7 +199,7 @@ const BarChartComponent: React.FC<BarChartComponentProps> = ({ tableData }) => {
     value: tableData.y[index],
   }));
 
-  return <BarChart data={sampleData} />;
+  return <BarChart data={sampleData} barWidth={60} />;
 };
 
 export default BarChartComponent;

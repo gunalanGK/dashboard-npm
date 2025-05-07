@@ -3,6 +3,7 @@ import amplifyService from "../services/aws/aws-services";
 import axios from "axios";
 import Cookies from "universal-cookie";
 import useAuthStore from "../store/authStore";
+import Config from "@/config";
 
 const cookies = new Cookies();
 
@@ -45,7 +46,7 @@ export const useAuth = () => {
           setAccessToken(accessToken); 
 
           const response = await axios.get(
-            "http://localhost:3000/api/crm/validate-user",
+            `${Config.apiUrl}validate-user`,
             {
               headers: {
                 Authorization: accessToken,
