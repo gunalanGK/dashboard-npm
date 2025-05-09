@@ -5,11 +5,13 @@ const DashboardPage = ({
   acceptedUserData,
   workspaceId,
   userName,
+  datasetRecord,
 }: {
   payload: any;
   acceptedUserData: any;
   workspaceId: any;
   userName: string;
+  datasetRecord: any;
 }) => {
   return (
     <ConnectDatasourcePage
@@ -17,6 +19,7 @@ const DashboardPage = ({
       acceptedUserData={acceptedUserData}
       workspaceId={workspaceId}
       userName={userName}
+      datasetRecord={datasetRecord}
     />
   );
 };

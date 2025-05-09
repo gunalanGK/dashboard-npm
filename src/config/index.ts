@@ -15,7 +15,16 @@ const Config = {
   // clientGraphqlUrl: "https://api.testin.doworks.com/api/client/graphql",
   // serverGraphqlUrl: "https://api.testin.doworks.com/api/crm/graphql",
   // notificationApiUrl: "https://api.testin.doworks.com/api/notification/",
-  // dynamicDshboardUrl: "https://api.doworks.com/dynamicdashboard/"
+  // dynamicDashboardUrl: "https://api.testin.doworks.com/dynamicdashboard/",
+
+  // apiUrl: "https://api.doworks.com/api/crm/",
+  // clientApiUrl: "https://api.doworks.com/api/client/",
+  // tenantSocketUrl: "https://api.doworks.com/",
+  // clientSocketUrl: "https://api.doworks.com/",
+  // clientGraphqlUrl: "https://api.doworks.com/api/client/graphql",
+  // serverGraphqlUrl: "https://api.doworks.com/api/crm/graphql",
+  // notificationApiUrl: "https://api.doworks.com/api/notification/",
+  // dynamicDashboardUrl: "https://api.doworks.com/dynamicdashboard/",
 
   // apiUrl: "https://api.doworks.com/api/crm/",
   // clientApiUrl: "https://api.doworks.com/api/client/",

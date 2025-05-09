@@ -6,6 +6,7 @@ declare const Config: {
     clientGraphqlUrl: string;
     serverGraphqlUrl: string;
     notificationApiUrl: string;
+    dynamicDashboardUrl: string;
     pattern: {
         emailValidation: RegExp;
         webSiteValidation: RegExp;

@@ -174,9 +174,11 @@ $crmColorConfig:
 	'user-purple' $user-purple,
 	'transparent' transparent,
 	'none' none,
-  'task-dashboard-border' $task-dashboard-border, 
-  'bg-task' $bg-task,
-  'task-color' $task-color;
+    'task-dashboard-border' $task-dashboard-border, 
+    'bg-task' $bg-task,
+    'task-color' $task-color
+    'error-border' $error-border,
+    'error-lighten1' $error-lighten1;
 
 //Border Radius
 $radius2: 0.125rem;

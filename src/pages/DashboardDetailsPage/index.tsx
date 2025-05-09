@@ -1,7 +1,7 @@
 import { getGreeting } from "@/services/helper/service";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InsertCommentOutlinedIcon from "@mui/icons-material/InsertCommentOutlined";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { clientApiGetCall, clientApiPutCall } from "@/services/api/api.service";
 import { useTaskDataStore } from "@/store/taskStore";
 import DoughnutChartComponent from "@/components/DoughnutChart";
@@ -23,11 +23,13 @@ const DashboardDetailsPage = ({
   columnData,
   workspaceId,
   userName,
+  datasetRecord,
 }: {
   acceptedUserData: any;
   columnData: any;
   workspaceId: any;
   userName: string;
+  datasetRecord: any;
 }) => {
   const {
     taskData,
@@ -38,13 +40,40 @@ const DashboardDetailsPage = ({
   } = useTaskDataStore();
   const [cardData, setcardData] = useState([]);
 
-  console.log("columnData", columnData);
-
   const { tableName } = useTableNameStore();
+
+  const updateRecordDrawerQuery = ({
+    recordDrawerId,
+    recordDrawerTab,
+    recordDrawerDataset,
+  }: {
+    recordDrawerId?: string | null;
+    recordDrawerTab?: string | null;
+    recordDrawerDataset?: string | null;
+  }) => {
+    if (typeof window === "undefined") return; // guard for SSR
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+
+    const updates = { recordDrawerId, recordDrawerTab, recordDrawerDataset };
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined) return; // leave as-is
+      if (value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+
+    const newUrl = `${url.pathname}?${params.toString()}${url.hash}`;
+    window.history.replaceState(null, "", newUrl);
+  };
 
   let datasetDetailsId: any = {};
 
-  tableName?.forEach((data) => {
+  datasetRecord?.forEach((data: any) => {
     datasetDetailsId = { ...datasetDetailsId, [data.id]: data };
   });
 
@@ -90,8 +119,6 @@ const DashboardDetailsPage = ({
   const getselectTable = async () => {
     try {
       const url = `workspace/${workspaceId}/datasets/engagement/task`;
-
-      console.log("selectTable", selectTable);
 
       const response = await clientApiGetCall(url, {
         workId: selectTable,
@@ -187,19 +214,10 @@ const DashboardDetailsPage = ({
         recordId: rowId,
       });
 
-      console.log("response", response);
-
       if (response?.data?.error) {
         // updateError(response.data.error);
       } else {
         updateTaskDoneById({ id, done: completed });
-
-        console.log(
-          "-------->",
-          taskData?.map((task) =>
-            task.id === id ? { ...task, done: completed } : task
-          )
-        );
       }
     } catch (err) {
       console.log(err);
@@ -350,135 +368,125 @@ const DashboardDetailsPage = ({
             </div>
           </div>
           <div className="bg-bg-task maxh-772px p-12 flex-1 overflow-auto">
-            {taskData?.map((task) => (
-              <div
-                className={`p-16 mb-10 bg-white radius-8
+            {taskData?.map((task) => {
+              const isDueExpired = isDateTodayOrFuture(
+                getDateForTask("2025-05-07T17:56:17.099Z")
+              );
+              return (
+                <div
+                  className={`p-16 mb-10 bg-white radius-8 
                    ${
                      task?.dueDate
-                       ? !isDateTodayOrFuture(getDateForTask(task?.dueDate))
+                       ? !isDueExpired
                          ? "border-solid-popper-border"
                          : "border-solid-error-border"
                        : "border-solid-popper-border"
                    } 
                 `}
-              >
-                <div className="d-flex h-24px align-center justify-between mb-4">
-                  <div className="d-flex">
-                    <div className="h-100 w-100 d-flex radius-4 bg-blue-lighten9 border-blue-lighten10 align-center justify-center p-4 mr-4">
-                      <span className=" txt-blue-darken10 material-icons-outlined f-16  txt-text-grey-primary">
-                        {datasetDetailsId[task.workId]?.icon}
-                      </span>
+                >
+                  <div className="d-flex h-24px align-center justify-between mb-4">
+                    <div className="d-flex align-center">
+                      <div className="h-100 w-24px d-flex radius-4 bg-blue-lighten9 border-blue-lighten10 align-center justify-center p-4 mr-4">
+                        <span className=" txt-blue-darken10 material-icons-outlined f-16  txt-text-grey-primary">
+                          {datasetDetailsId[task.workId]?.icon}
+                        </span>
+                      </div>
+                      <div className=" flex-1 maxw-200  f-w-600 f-12 txt-blue-darken8 text-truncate">
+                        {datasetDetailsId[task.workId]?.name}
+                      </div>
                     </div>
-                    <div className="d-flex align-center f-w-600 f-12 txt-blue-darken8">
-                      {datasetDetailsId[task.workId]?.displayName}
+
+                    <div>
+                      {task?.completed ? (
+                        <img
+                          src={"/dataset-record-drawer/Check_1.svg"}
+                          alt="undone"
+                          width={20}
+                          height={20}
+                          className="cursor-pointer"
+                          onClick={() => {
+                            toggleCompleteTask({
+                              id: task.id,
+                              completed: !task.completed,
+                              datasetId: datasetDetailsId[task.workId]?.id,
+                              datasetName:
+                                datasetDetailsId[task.workId]?.datasetName,
+                              rowId: task.recordId,
+                            });
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            "/dataset-record-drawer/check_circle_outline.svg"
+                          }
+                          alt="undone"
+                          width={20}
+                          height={20}
+                          className="cursor-pointer"
+                          onClick={() => {
+                            toggleCompleteTask({
+                              id: task.id,
+                              completed: !task.completed,
+                              datasetId: datasetDetailsId[task.workId]?.id,
+                              datasetName:
+                                datasetDetailsId[task.workId]?.datasetName,
+                              rowId: task.recordId,
+                            });
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
 
-                  <div>
-                    {task?.completed ? (
-                      <img
-                        src={"/dataset-record-drawer/Check_1.svg"}
-                        alt="undone"
-                        width={20}
-                        height={20}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          toggleCompleteTask({
-                            id: task.id,
-                            completed: !task.completed,
-                            datasetId: datasetDetailsId[task.workId]?.id,
-                            datasetName:
-                              datasetDetailsId[task.workId]?.datasetName,
-                            rowId: task.recordId,
-                          });
-                        }}
-                      />
+                  <div
+                    className="h-20px f-w-500 f-14 txt-shadow mb-4 cursor-pointer"
+                    onClick={() => {
+                      updateRecordDrawerQuery({
+                        recordDrawerDataset:
+                          datasetDetailsId[task.workId]?.datasetName,
+                        recordDrawerId: task.recordId,
+                        recordDrawerTab: "3",
+                      });
+                    }}
+                  >
+                    {task.title}
+                  </div>
+
+                  {task?.description ? (
+                    <div className="maxh-40px f-w-400 f-12 txt-close-icon truncate-2-lines l-h-20">
+                      {task?.description}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+
+                  <div className="mt-8 d-flex">
+                    <InsertCommentOutlinedIcon className="f-16 txt-grey-secondary mr-4" />
+                    <p className="f-12 f-w-500 txt-grey-secondary">
+                      {task?.commentCount}
+                    </p>
+                  </div>
+
+                  <div className="mt-8 d-flex align-center justify-between">
+                    <div>{getAssignTo(task.assignTo)}</div>
+                    {task.dueDate ? (
+                      <div
+                        className={`p-4 radius-4 f-12 f-w-600 ${
+                          isDueExpired
+                            ? "bg-error-lighten1 txt-error-dark1"
+                            : "bg-blue-lighten9 txt-blue-darken10"
+                        }`}
+                      >
+                        {timeConverter(task.dueDate)}
+                      </div>
                     ) : (
-                      <img
-                        src={"/dataset-record-drawer/check_circle_outline.svg"}
-                        alt="undone"
-                        width={20}
-                        height={20}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          toggleCompleteTask({
-                            id: task.id,
-                            completed: !task.completed,
-                            datasetId: datasetDetailsId[task.workId]?.id,
-                            datasetName:
-                              datasetDetailsId[task.workId]?.datasetName,
-                            rowId: task.recordId,
-                          });
-                        }}
-                      />
+                      <></>
                     )}
                   </div>
                 </div>
-
-                <div className="h-20px f-w-500 f-14 txt-shadow mb-4">
-                  {task.title}
-                </div>
-
-                {task?.description ? (
-                  <div className="maxh-40px f-w-400 f-12 txt-close-icon truncate-2-lines l-h-20">
-                    {task?.description}
-                  </div>
-                ) : (
-                  <></>
-                )}
-
-                {task?.commentCount ? (
-                  <div className="mt-8 d-flex">
-                    <InsertCommentOutlinedIcon className="f-20 txt-grey-secondary mr-4" />
-                    <p>{task?.commentCount}</p>
-                  </div>
-                ) : (
-                  <></>
-                )}
-
-                <div className="mt-8 d-flex align-center justify-between">
-                  <div>{getAssignTo(task.assignTo)}</div>
-                  <div className="p-4 radius-4 bg-blue-lighten9">
-                    {timeConverter(task.updatedAt)}
-                  </div>
-                </div>
-              </div>
-              // <div className="maxh-176px p-16 mb-10 bg-white radius-8">
-              //   <div className="d-flex">
-              //     <div className="mr-8">
-              //       {task?.completed ? (
-              //         <img
-              //           src={"/dataset-record-drawer/Check_1.svg"}
-              //           alt="undone"
-              //           width={20}
-              //           height={20}
-              //           className="cursor-pointer"
-              //         />
-              //       ) : (
-              //         <img
-              //           src={"/dataset-record-drawer/check_circle_outline.svg"}
-              //           alt="undone"
-              //           width={20}
-              //           height={20}
-              //           className="cursor-pointer"
-              //         />
-              //       )}
-              //     </div>
-              //     <div className="flex-1 text-trim">{task.title}</div>
-              //   </div>
-
-              //   <div className="mt-8">
-              //     <InsertCommentOutlinedIcon className="f-20 txt-grey-secondary mr-4" />
-              //   </div>
-
-              //   <div className="mt-8 d-flex align-center justify-between">
-              //     <div>{getAssignTo(task.assignTo)}</div>
-              //     <div className="p-4 radius-4 bg-blue-lighten9">
-              //       {timeConverter(task.updatedAt)}
-              //     </div>
-              //   </div>
-              // </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
