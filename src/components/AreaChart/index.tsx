@@ -239,7 +239,7 @@ const AreaChartComponent: React.FC<TableDataProps> = ({ tableData }) => {
     );
   }
 
-  const formattedData: DataPoint[] = tableData.x.map((xValue, index) => ({
+  const formattedData: DataPoint[] = tableData?.x?.map((xValue, index) => ({
     x: xValue,
     y: Number(tableData.y[index]) || 0,
   }));

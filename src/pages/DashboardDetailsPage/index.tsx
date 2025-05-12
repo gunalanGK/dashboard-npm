@@ -99,7 +99,7 @@ const DashboardDetailsPage = ({
       if (cardResponse.data) {
         setcardData(cardResponse.data);
       }
-      const plotDetails = columnData.plotData.map(async (plot: any) => {
+      const plotDetails = columnData?.plotData?.map(async (plot: any) => {
         const response = await apiClient.get(
           `/get-data/xy-data?${plot.params}`
         );
@@ -154,7 +154,7 @@ const DashboardDetailsPage = ({
 
     return (
       <div className="d-flex align-center">
-        {showUserData.map((userData) => (
+        {showUserData?.map((userData) => (
           <img
             key={userData?.id}
             src={userData?.picture || "/dataset-record-drawer/person.jpg"}
@@ -243,6 +243,9 @@ const DashboardDetailsPage = ({
     }
   };
 
+  console.log("plotDatasets", plotDatasets);
+  console.log("taskData", taskData);
+
   return (
     <>
       <div className="d-flex mb-8 justify-between h-32px">
@@ -308,30 +311,34 @@ const DashboardDetailsPage = ({
 
       <div className="h-822px d-flex gap-16">
         <div className="flex-1 d-flex flex-column gap-16">
-          {Array.from(
-            { length: Math.ceil(plotDatasets?.length / 2) },
-            (_, rowIdx) => (
-              <div key={rowIdx} className="d-flex gap-16">
-                {plotDatasets
-                  ?.slice(rowIdx * 2, rowIdx * 2 + 2)
-                  ?.map((plot, idx) => (
-                    <div
-                      key={idx}
-                      className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1"
-                    >
-                      <div className="h-56px d-flex align-center justify-between p-12">
-                        <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
-                          {plot.plot_name}
+          {plotDatasets.length ? (
+            Array.from(
+              { length: Math.ceil(plotDatasets?.length / 2) },
+              (_, rowIdx) => (
+                <div key={rowIdx} className="d-flex gap-16">
+                  {plotDatasets
+                    ?.slice(rowIdx * 2, rowIdx * 2 + 2)
+                    ?.map((plot, idx) => (
+                      <div
+                        key={idx}
+                        className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1"
+                      >
+                        <div className="h-56px d-flex align-center justify-between p-12">
+                          <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
+                            {plot.plot_name}
+                          </div>
+                          <MoreHorizIcon />
                         </div>
-                        <MoreHorizIcon />
+                        <div className="flex-1 d-flex justify-center align-center p-12">
+                          {renderChart(plot)}
+                        </div>
                       </div>
-                      <div className="flex-1 d-flex justify-center align-center p-12">
-                        {renderChart(plot)}
-                      </div>
-                    </div>
-                  ))}
-              </div>
+                    ))}
+                </div>
+              )
             )
+          ) : (
+            <></>
           )}
         </div>
 

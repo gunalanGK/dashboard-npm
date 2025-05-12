@@ -1,5 +1,5 @@
 {
-  "name": "test-npm-dynamicdashboard-prob",
+  "name": "test-npm",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

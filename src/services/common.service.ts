@@ -26,7 +26,7 @@ export const deleteCookies = () => {
           i ? (arr[i] = "." + val + acc) : ((arr[i] = ""), arr),
         ""
       )
-      .map(
+      ?.map(
         (domain: any) =>
           (document.cookie = `${name}=;max-age=0;path=/;domain=${domain}`)
       )

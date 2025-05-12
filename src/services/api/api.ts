@@ -4,8 +4,6 @@ import Cookies from "universal-cookie";
 import Config from "@/config";
 
 const API_BASE_URL = Config.dynamicDashboardUrl;
-;
-
 const cookies = new Cookies();
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -44,7 +42,7 @@ export const fetchTableColumnDataTypes = async (selectedTables: string[]) => {
   if (selectedTables.length === 0) return null;
 
   const queryString = selectedTables
-    .map((table) => `tables=${encodeURIComponent(table)}`)
+    ?.map((table) => `tables=${encodeURIComponent(table)}`)
     .join("&");
 
   try {
@@ -63,7 +61,7 @@ export const fetchDashboardTemplate = async (
   if (selectedTables.length === 0) return null;
 
   const queryString = selectedTables
-    .map((table) => `tables=${encodeURIComponent(table)}`)
+    ?.map((table) => `tables=${encodeURIComponent(table)}`)
     .join("&");
 
   try {

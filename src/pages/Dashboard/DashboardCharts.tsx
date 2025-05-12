@@ -59,7 +59,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ columnData }) => {
   };
 
   const layouts = {
-    lg: dataToUse.plotData.map((plot, i) => ({
+    lg: dataToUse?.plotData?.map((plot, i) => ({
       i: plot.plot_name,
       x: (i % 2) * 6,
       y: Math.floor(i / 2) * 6,
@@ -82,7 +82,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ columnData }) => {
     <div
       style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}
     >
-      {dataToUse.plotData.map((plot) => (
+      {dataToUse.plotData?.map((plot) => (
         <div key={plot.plot_name} className="bg-white rounded-xl border shadow">
           <div className="h-14 px-4 flex items-center font-semibold border-b">
             {plot.plot_name}

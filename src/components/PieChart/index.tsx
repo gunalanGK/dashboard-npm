@@ -7,15 +7,21 @@ type DataPoint = {
 };
 
 const customPalette = [
-  "#80cbc4", "#ef5350", "#ff8a65", "#ffd54f", "#fdd835", "#aed581",
-  "#ba68c8", "#4fc3f7",
+  "#80cbc4",
+  "#ef5350",
+  "#ff8a65",
+  "#ffd54f",
+  "#fdd835",
+  "#aed581",
+  "#ba68c8",
+  "#4fc3f7",
 ];
 
 const fallbackPalette = d3.schemeSet2;
 
 const combinedPalette = [
   ...customPalette,
-  ...fallbackPalette.slice(customPalette.length)
+  ...fallbackPalette.slice(customPalette.length),
 ];
 
 const PieChart: React.FC<{
@@ -35,7 +41,7 @@ const PieChart: React.FC<{
 
     const color = d3
       .scaleOrdinal<string, string>()
-      .domain(data.map((d) => String(d.category)))
+      .domain(data?.map((d) => String(d.category)))
       .range(combinedPalette);
 
     const pie = d3.pie<DataPoint>().value((d) => d.value);
@@ -43,7 +49,7 @@ const PieChart: React.FC<{
 
     const arc = d3
       .arc<d3.PieArcDatum<DataPoint>>()
-      .innerRadius(0) 
+      .innerRadius(0)
       .outerRadius(radius);
 
     const g = svg
@@ -65,80 +71,92 @@ const PieChart: React.FC<{
       .style("opacity", 0)
       .style("pointer-events", "none");
 
-    const segments = g.selectAll(".segment")
+    const segments = g
+      .selectAll(".segment")
       .data(data_ready)
       .enter()
       .append("g")
       .attr("class", "segment");
 
-   segments.append("path")
-       .attr("class", "main-arc")
-       .attr("d", function(d) { return arc(d as d3.PieArcDatum<DataPoint>); })
-       .attr("fill", (d) => color(String(d.data.category)))
-       .attr("stroke", "#fff")
-       .style("stroke-width", "2px")
-       .style("opacity", 0.9);
- 
-     segments.append("path")
-       .attr("class", "highlight-arc")
-       .attr("d", function(d) { 
-         const highlightArc = d3
-           .arc<d3.PieArcDatum<DataPoint>>()
-           .innerRadius(radius) 
-           .outerRadius(radius + 10);
-         return highlightArc(d as d3.PieArcDatum<DataPoint>); 
-       })
-       .attr("fill", (d) => {
-         const baseColor = color(String(d.data.category));
-         const fadedColor = d3.color(baseColor)?.copy();
-         if (fadedColor) {
-           fadedColor.opacity = 0.6; 
-         }
-         return fadedColor?.toString() || baseColor;
-       })
-       .attr("stroke", "none") 
-       .style("opacity", 0); 
- 
-     segments
-       .on("mouseover", function(event, d) {
-         const percent = ((d.data.value / d3.sum(data, (d) => d.value)) * 100).toFixed(1);
-         tooltip
-           .style("opacity", 1)
-           .html(
-             `<strong>${d.data.category}</strong><br/>Value: ${d.data.value} (${percent}%)`
-           )
-           .style("left", event.pageX + 10 + "px")
-           .style("top", event.pageY - 40 + "px");
- 
-         d3.select(this).select(".highlight-arc")
-           .transition()
-           .duration(200)
-           .style("opacity", 1);
- 
-         d3.select(this).select(".main-arc")
-           .transition()
-           .duration(200)
-           .attr("stroke", "none");
-       })
-       .on("mousemove", function(event) {
-         tooltip
-           .style("left", event.pageX + 10 + "px")
-           .style("top", event.pageY - 40 + "px");
-       })
-       .on("mouseout", function() {
-         tooltip.style("opacity", 0);
-         
-         d3.select(this).select(".highlight-arc")
-           .transition()
-           .duration(200)
-           .style("opacity", 0);
- 
-         d3.select(this).select(".main-arc")
-           .transition()
-           .duration(200)
-           .attr("stroke", "#fff");
-       });
-   }, [data, width, height]);
+    segments
+      .append("path")
+      .attr("class", "main-arc")
+      .attr("d", function (d) {
+        return arc(d as d3.PieArcDatum<DataPoint>);
+      })
+      .attr("fill", (d) => color(String(d.data.category)))
+      .attr("stroke", "#fff")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.9);
+
+    segments
+      .append("path")
+      .attr("class", "highlight-arc")
+      .attr("d", function (d) {
+        const highlightArc = d3
+          .arc<d3.PieArcDatum<DataPoint>>()
+          .innerRadius(radius)
+          .outerRadius(radius + 10);
+        return highlightArc(d as d3.PieArcDatum<DataPoint>);
+      })
+      .attr("fill", (d) => {
+        const baseColor = color(String(d.data.category));
+        const fadedColor = d3.color(baseColor)?.copy();
+        if (fadedColor) {
+          fadedColor.opacity = 0.6;
+        }
+        return fadedColor?.toString() || baseColor;
+      })
+      .attr("stroke", "none")
+      .style("opacity", 0);
+
+    segments
+      .on("mouseover", function (event, d) {
+        const percent = (
+          (d.data.value / d3.sum(data, (d) => d.value)) *
+          100
+        ).toFixed(1);
+        tooltip
+          .style("opacity", 1)
+          .html(
+            `<strong>${d.data.category}</strong><br/>Value: ${d.data.value} (${percent}%)`
+          )
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 40 + "px");
+
+        d3.select(this)
+          .select(".highlight-arc")
+          .transition()
+          .duration(200)
+          .style("opacity", 1);
+
+        d3.select(this)
+          .select(".main-arc")
+          .transition()
+          .duration(200)
+          .attr("stroke", "none");
+      })
+      .on("mousemove", function (event) {
+        tooltip
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 40 + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.style("opacity", 0);
+
+        d3.select(this)
+          .select(".highlight-arc")
+          .transition()
+          .duration(200)
+          .style("opacity", 0);
+
+        d3.select(this)
+          .select(".main-arc")
+          .transition()
+          .duration(200)
+          .attr("stroke", "#fff");
+      });
+  }, [data, width, height]);
 
   return <svg ref={ref} />;
 };
@@ -155,7 +173,7 @@ const PieChartComponent: React.FC<PieChartComponentProps> = ({ tableData }) => {
     return <p>No data available</p>;
   }
 
-  const sampleData = tableData.x.map((label, index) => ({
+  const sampleData = tableData?.x?.map((label, index) => ({
     category: label,
     value: Number(tableData.y[index] ?? 0),
   }));
@@ -169,7 +187,7 @@ const PieChartComponent: React.FC<PieChartComponentProps> = ({ tableData }) => {
       </div>
 
       <div className="ml-5 flex-1 d-flex gap-8 flex-column align-center overflow-auto justify-center">
-        {sampleData.map((item, index) => (
+        {sampleData?.map((item, index) => (
           <div key={index} className="d-flex items-center mb-2">
             <div
               className="w-15px h-15px mr-2 radius-360"

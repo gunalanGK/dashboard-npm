@@ -1,4 +1,4 @@
-import { ObjectKeyGeneric } from '@/types/common';
+import { ObjectKeyGeneric } from "@/types/common";
 type Cloneable = Record<string, any> | Array<any> | any;
 type AnyFunction = (...args: any[]) => any;
 export declare const CustomStartCase: (data: string) => string;

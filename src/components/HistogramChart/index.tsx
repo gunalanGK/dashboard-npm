@@ -14,15 +14,21 @@ interface HistogramChartProps {
 }
 
 const customPalette = [
-  "#80cbc4", "#ef5350", "#ff8a65", "#ffd54f", "#fdd835", "#aed581",
-  "#ba68c8", "#4fc3f7",
+  "#80cbc4",
+  "#ef5350",
+  "#ff8a65",
+  "#ffd54f",
+  "#fdd835",
+  "#aed581",
+  "#ba68c8",
+  "#4fc3f7",
 ];
 
 const fallbackPalette = d3.schemeSet2;
 
 const combinedPalette = [
   ...customPalette,
-  ...fallbackPalette.slice(customPalette.length)
+  ...fallbackPalette.slice(customPalette.length),
 ];
 
 const HistogramChart: React.FC<HistogramChartProps> = ({
@@ -34,29 +40,28 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const margin = { top: 20, right: 30, bottom: 40, left: 50 };
-  
+
   useEffect(() => {
     if (!data || data.length === 0) return;
-
 
     const barSpacing = 1;
     const totalWidth = data.length * (barWidth + barSpacing);
     const chartWidth = Math.max(width, totalWidth + margin.left + margin.right);
-    
+
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
-   
+
     svg.attr("width", chartWidth);
-    
+
     const total = d3.sum(data, (d) => d.value);
     const innerWidth = chartWidth - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
     const xScale = d3
       .scaleBand()
-      .domain(data.map((d) => d.category))
+      .domain(data?.map((d) => d.category))
       .range([0, totalWidth])
-      .padding(barSpacing / (barWidth + barSpacing)); 
+      .padding(barSpacing / (barWidth + barSpacing));
 
     const yMax = d3.max(data, (d) => d.value) ?? 0;
     const yScale = d3
@@ -67,40 +72,39 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
 
     const colors = d3
       .scaleOrdinal<string, string>()
-      .domain(data.map((d) => d.category))
+      .domain(data?.map((d) => d.category))
       .range(combinedPalette);
 
     const chart = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-      
- 
-    chart.append("g")
+
+    chart
+      .append("g")
       .attr("class", "grid")
       .call(
-        d3.axisLeft(yScale)
-          .tickValues(yScale.ticks().filter(tick => Number.isInteger(tick))) 
+        d3
+          .axisLeft(yScale)
+          .tickValues(yScale.ticks().filter((tick) => Number.isInteger(tick)))
           .tickSize(-innerWidth)
           .tickFormat(() => "")
       )
       .selectAll("line")
       .attr("stroke", "#e5e7eb");
-    
 
-    const yAxisG = chart
-      .append("g")
-      .call(
-        d3
-          .axisLeft(yScale)
-          .ticks(Math.min(Math.ceil(yMax), 5))
-          .tickFormat(d3.format("d"))
-      );
+    const yAxisG = chart.append("g").call(
+      d3
+        .axisLeft(yScale)
+        .ticks(Math.min(Math.ceil(yMax), 5))
+        .tickFormat(d3.format("d"))
+    );
 
     yAxisG.selectAll("text").style("font-size", "12px");
     yAxisG.selectAll("path.domain").attr("stroke", "#e5e7eb");
     yAxisG.selectAll("line").attr("stroke", "#e5e7eb");
 
-    chart.append("text")
+    chart
+      .append("text")
       .attr("transform", "rotate(-90)")
       .attr("x", -innerHeight / 2)
       .attr("y", -margin.left + 15)
@@ -108,7 +112,6 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
       .attr("fill", "#6b7280")
       .style("font-size", "14px")
       .text("Count");
-
 
     const xAxis = chart
       .append("g")
@@ -118,11 +121,11 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
         g.selectAll(".tick line").remove();
         g.select(".domain").attr("stroke", "#e5e7eb");
       });
-    
-    xAxis.selectAll("text")
+
+    xAxis
+      .selectAll("text")
       .style("text-anchor", "middle")
       .style("font-size", "12px");
-
 
     const tooltip = d3
       .select("body")
@@ -174,14 +177,13 @@ const HistogramChart: React.FC<HistogramChartProps> = ({
     };
   }, [data, width, height, barWidth]);
 
-
   return (
-    <div 
+    <div
       ref={containerRef}
-      style={{ 
-        width: `${width}px`, 
+      style={{
+        width: `${width}px`,
         overflow: "auto",
-        position: "relative"
+        position: "relative",
       }}
     >
       <svg ref={svgRef} height={height} />
@@ -193,8 +195,10 @@ interface HistogramChartComponentProps {
   tableData: { x: string[]; y: number[] };
 }
 
-const HistogramChartComponent: React.FC<HistogramChartComponentProps> = ({ tableData }) => {
-  const sampleData = tableData.x.map((category, index) => ({
+const HistogramChartComponent: React.FC<HistogramChartComponentProps> = ({
+  tableData,
+}) => {
+  const sampleData = tableData?.x?.map((category, index) => ({
     category,
     value: tableData.y[index],
   }));

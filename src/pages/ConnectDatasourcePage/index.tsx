@@ -1,7 +1,10 @@
 import { memo, useEffect, useState } from "react";
 import ConnectDatasourceModal from "@/components/ConnectDatasourceModal";
 import { Button } from "@mui/material";
-import { connectToDatabase } from "@/services/api/database";
+import {
+  connectToDatabase,
+  disconnectToDatabase,
+} from "@/services/api/database";
 import { useDashboardStore } from "@/store/dashboardState.store";
 import DashboardCharts from "../Dashboard/DashboardCharts";
 import DashboardPage from "@/DashboardPage";
@@ -14,6 +17,7 @@ import {
 } from "@/services/api/api";
 import { DashboardTemplate } from "@/utils/constants/dashboardTemplate";
 import { useTaskDataStore } from "@/store/taskStore";
+import Config from "@/config";
 
 // need to update the type
 const ConnectDatasourccePage = ({
@@ -31,6 +35,7 @@ const ConnectDatasourccePage = ({
 }) => {
   //  connectDatasource modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConnect, setIsConnect] = useState(false);
 
   const { columnData, setColumnData } = useDashboardStore();
   const { dashboardTemplateList, updateDashboardTemplateList, updateError } =
@@ -41,6 +46,8 @@ const ConnectDatasourccePage = ({
   const connectDB = async () => {
     await connectToDatabase(payload);
   };
+
+  const disconnectDB = async () => {};
 
   const getDashboardTemplateList = async () => {
     try {
@@ -55,13 +62,21 @@ const ConnectDatasourccePage = ({
   };
 
   const connectAndGetTemplate = async () => {
-    await connectDB();
-    await getDashboardTemplateList();
+    try {
+      await connectDB();
+      setIsConnect(true);
+    } catch (err) {}
+
+    return () => disconnectToDatabase();
   };
 
   useEffect(() => {
     connectAndGetTemplate();
   }, [payload]);
+
+  useEffect(() => {
+    if (isConnect) getDashboardTemplateList();
+  }, [isConnect]);
 
   const getColumnData = async () => {
     if (dashboardTemplateList?.length) {
@@ -69,11 +84,11 @@ const ConnectDatasourccePage = ({
 
       if (dashboardTemplateData && dashboardTemplateData["template-type"]) {
         const data = await fetchDashboardTemplate(
-          dashboardTemplateData.workspace_ids?.split(","),
+          dashboardTemplateData.work_ids?.split(","),
           dashboardTemplateData["template-type"]
         );
         setColumnData(data);
-        updateSelectTable(dashboardTemplateData.workspace_ids?.split(","));
+        updateSelectTable(dashboardTemplateData.work_ids?.split(","));
       }
     }
   };

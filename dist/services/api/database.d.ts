@@ -6,3 +6,4 @@ export interface ConnectionPayload {
     port: string;
 }
 export declare const connectToDatabase: (payload: ConnectionPayload) => Promise<any>;
+export declare const disconnectToDatabase: () => Promise<any>;

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import ConnectDatasourcePage from "./pages/ConnectDatasourcePage/index";
 
 const DashboardPage = ({
@@ -24,4 +25,4 @@ const DashboardPage = ({
   );
 };
 
-export default DashboardPage;
+export default memo(DashboardPage);

@@ -44,7 +44,7 @@ const DoughnutChart: React.FC<{
 
     const color = d3
       .scaleOrdinal<string, string>()
-      .domain(data.map((d) => String(d.category)))
+      .domain(data?.map((d) => String(d.category)))
       .range(combinedPalette);
 
     const pie = d3.pie<DataPoint>().value((d) => d.value);
@@ -178,7 +178,7 @@ const DoughnutChartComponent: React.FC<DoughnutChartComponentProps> = ({
     return <p>No data available</p>;
   }
 
-  const sampleData = tableData.x.map((label, index) => ({
+  const sampleData = tableData?.x?.map((label, index) => ({
     category: label,
     value: Number(tableData.y[index] ?? 0),
   }));
@@ -192,7 +192,7 @@ const DoughnutChartComponent: React.FC<DoughnutChartComponentProps> = ({
       </div>
 
       <div className="ml-5 flex-1  d-flex gap-8 flex-column align-center overflow-auto justify-center">
-        {sampleData.map((item, index) => (
+        {sampleData?.map((item, index) => (
           <div key={index} className="d-flex items-center mb-2">
             <div
               className="w-15px h-15px mr-2 radius-360"

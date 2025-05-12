@@ -7,7 +7,11 @@ interface ScatterPlotProps {
   height?: number;
 }
 
-const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, width = 500, height = 300 }) => {
+const ScatterPlot: React.FC<ScatterPlotProps> = ({
+  data,
+  width = 500,
+  height = 300,
+}) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -23,14 +27,15 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, width = 500, height = 3
     const chart = svg
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
-    
-    const isDate = data[0]?.x && !isNaN(Date.parse(data[0].x.toString()));
 
+    const isDate = data[0]?.x && !isNaN(Date.parse(data[0].x.toString()));
 
     const xScale = isDate
       ? d3
           .scaleTime()
-          .domain(d3.extent(data, (d) => new Date(d.x.toString())) as [Date, Date])
+          .domain(
+            d3.extent(data, (d) => new Date(d.x.toString())) as [Date, Date]
+          )
           .range([0, innerWidth])
       : d3
           .scaleLinear()
@@ -41,7 +46,6 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, width = 500, height = 3
       .scaleLinear()
       .domain([0, d3.max(data, (d) => d.y) || 0])
       .range([innerHeight, 0]);
-    
 
     chart
       .selectAll("circle")
@@ -52,24 +56,21 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({ data, width = 500, height = 3
       .attr("cy", (d) => yScale(d.y))
       .attr("r", 5)
       .attr("fill", "steelblue");
-    
 
     const xAxis = isDate
       ? d3.axisBottom(xScale as d3.ScaleTime<number, number>).ticks(5)
       : d3.axisBottom(xScale);
-    
 
     if (isDate) {
       xAxis.tickFormat((d) => {
         return d3.timeFormat("%Y-%m-%d")(d as Date);
       });
     }
-    
+
     chart
       .append("g")
       .attr("transform", `translate(0,${innerHeight})`)
       .call(xAxis);
-
 
     chart.append("g").call(d3.axisLeft(yScale));
   }, [data, width, height]);
@@ -81,13 +82,15 @@ interface ScatterPlotComponentProps {
   tableData: { x: (string | number)[]; y: number[] };
 }
 
-const ScatterPlotComponent: React.FC<ScatterPlotComponentProps> = ({ tableData }) => {
+const ScatterPlotComponent: React.FC<ScatterPlotComponentProps> = ({
+  tableData,
+}) => {
   if (!tableData || !tableData.x || !tableData.y || tableData.x.length === 0) {
     console.error("Invalid or missing data for ScatterPlotComponent");
     return null;
   }
 
-  const formattedData = tableData.x.map((xValue, index) => ({
+  const formattedData = tableData?.x?.map((xValue, index) => ({
     x: xValue,
     y: tableData.y[index] || 0,
   }));
