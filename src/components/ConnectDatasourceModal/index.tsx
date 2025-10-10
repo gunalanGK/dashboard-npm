@@ -1,5 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
-
+import React, { memo, useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -10,14 +9,45 @@ import {
   TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { fetchTableColumnDataTypes, fetchTableNames } from "@/services/api/api";
-import "./ConnectDatasourceModal.scss";
-import { useDatabaseStore } from "@/store/database.store";
+import axios from "axios";
+
+import {
+  fetchTableColumnDataTypes,
+  fetchTableNames,
+  fetchTablesData,
+} from "@/services/api/api";
 import { useDashboardStore } from "@/store/dashboardState.store";
-import { clientApiGetCall } from "@/services/api/api.service";
 import { useTaskDataStore } from "@/store/taskStore";
-import { useTableNameStore } from "@/store/tableNameList.store";
-import { useDashboardTemplateStore } from "@/store/dashboardTemplate.store";
+import { useTableDataStore } from "@/store/tableData.store";
+
+import "./ConnectDatasourceModal.scss";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const CustomTabPanel = ({
+  children,
+  value,
+  index,
+  ...other
+}: TabPanelProps) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+    {...other}
+    style={{ height: "100%" }}
+  >
+    {value === index && <Box>{children}</Box>}
+  </div>
+);
+
+const a11yProps = (index: number) => ({
+  id: `simple-tab-${index}`,
+  "aria-controls": `simple-tabpanel-${index}`,
+});
 
 const ConnectDatasourceModal = ({
   workspaceId,
@@ -30,24 +60,27 @@ const ConnectDatasourceModal = ({
 }) => {
   const [value, setValue] = useState(0);
   const [tableDetails, setTableDetails] = useState<any[]>([]);
-  const [selectedValues, setSelectedValues] = useState<any[]>([]);
+  
+  const { selectedTables, setSelectedTables, setColumnData } = useDashboardStore();
+  const { updateTaskData, updateError, updateSelectTable } = useTaskDataStore();
+  const { setTableData } = useTableDataStore();
 
-  const { setColumnData } = useDashboardStore();
-  const { updateTaskData, updateError, taskData, updateSelectTable } =
-    useTaskDataStore();
-
-  const { tableNameData } = useTableNameStore();
+  const groupedTables = useMemo(() => {
+    const groups: Record<string, any[]> = {};
+    tableDetails.forEach((table) => {
+      if (!groups[table.groupName]) groups[table.groupName] = [];
+      groups[table.groupName].push(table);
+    });
+    return groups;
+  }, [tableDetails]);
 
   const getTablesName = async () => {
     const tables = await fetchTableNames();
-    tableNameData(tables);
     setTableDetails(tables);
   };
 
   useEffect(() => {
-    if (isOpen) {
-      getTablesName();
-    }
+    if (isOpen) getTablesName();
   }, [isOpen]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -56,37 +89,64 @@ const ConnectDatasourceModal = ({
 
   const handleCheckboxChange = (event: any) => {
     const { value, checked } = event.target;
-
-    if (checked) {
-      // Add value to state if checked
-      setSelectedValues((prev) => [...prev, value]);
-    } else {
-      // Remove value from state if unchecked
-      setSelectedValues((prev) => prev.filter((item) => item !== value));
-    }
+    const updated = checked
+      ? [...selectedTables, value]
+      : selectedTables.filter((item) => item !== value);
+    setSelectedTables(updated);
   };
 
-  const getdashboardData = async () => {
-    const data = await fetchTableColumnDataTypes(selectedValues);
+  const handleGroupCheckboxChange = (event: any) => {
+    const { value: groupName, checked } = event.target;
+    const tablesInGroup = groupedTables[groupName] || [];
+    const tableIds = tablesInGroup.map((t) => `work_${t.id}`);
 
-    setColumnData(data);
+    const updated = checked
+      ? Array.from(new Set([...selectedTables, ...tableIds]))
+      : selectedTables.filter((t) => !tableIds.includes(t));
 
-    updateSelectTable(selectedValues);
+    setSelectedTables(updated);
+  };
+
+  const isGroupSelected = (groupName: string) => {
+    const tableIds = (groupedTables[groupName] || []).map(
+      (t) => `work_${t.id}`
+    );
+    return tableIds.every((id) => selectedTables.includes(id));
+  };
+
+  const isGroupPartiallySelected = (groupName: string) => {
+    const tableIds = (groupedTables[groupName] || []).map(
+      (t) => `work_${t.id}`
+    );
+    const selectedCount = tableIds.filter((id) =>
+      selectedTables.includes(id)
+    ).length;
+    return selectedCount > 0 && selectedCount < tableIds.length;
+  };
+
+  const getDashboardData = async () => {
+    if (!selectedTables.length) return;
 
     try {
-      const url = `workspace/${workspaceId}/datasets/engagement/task`;
+      const data = await fetchTableColumnDataTypes(selectedTables);
+      setColumnData(data);
 
-      const response = await clientApiGetCall(url, {
-        workId: selectedValues,
-      });
+      updateSelectTable(selectedTables);
 
-      if (response?.data?.error) {
-        updateError(response.data.error);
-      } else {
-        updateTaskData(response.data.data);
+      const response = await fetchTablesData(selectedTables);
+      if (response.data.success) {
+        setTableData(response.data.data);
       }
+
+      const taskRes = await fetch(
+        `workspace/${workspaceId}/datasets/engagement/task`,
+        { method: "GET", headers: { "Content-Type": "application/json" } }
+      );
+      const taskData = await taskRes.json();
+      if (taskData?.error) updateError(taskData.error);
+      else updateTaskData(taskData.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -95,139 +155,146 @@ const ConnectDatasourceModal = ({
       <Box
         sx={{
           width: 500,
-          height: 520,
+          maxHeight: 520,
           borderRadius: "8px",
-          border: "none",
           position: "absolute",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           bgcolor: "background.paper",
+          display: "flex",
+          flexDirection: "column",
           padding: "20px",
         }}
       >
-        {/* header */}
         <div className="mb-20">
           <div className="f-w-600 f-20 txt-text-grey-primary mb-8">
-            Connect datasource to this dashboard
+            Create Dashboard
           </div>
           <div className="f-w-400 f-14 txt-grey-darken4">
-            Based on the datasource you selected, charts will be generated.
+            Select the data sources you want to include in your new dashboard.
+            <br />
+            Charts will be generated automatically.
           </div>
         </div>
 
-        {/* body */}
-        <div className="h-348px">
-          <TextField
-            InputProps={{
-              startAdornment: <SearchIcon className="txt-grey-darken5 f-20" />,
-              sx: {
-                "&::placeholder": {
-                  color: "#A6AAAFed",
-                  fontSize: "14px",
-                  fontWeight: "400",
-                  opacity: 1,
-                },
+        <TextField
+          InputProps={{
+            startAdornment: <SearchIcon className="txt-grey-darken5 f-20" />,
+            sx: {
+              "&::placeholder": {
+                color: "#A6AAAFed",
+                fontSize: "14px",
+                fontWeight: "400",
+                opacity: 1,
               },
-            }}
-            placeholder="search"
-          />
+            },
+          }}
+          placeholder="Search"
+          sx={{ mb: 1 }}
+        />
 
-          <div className="">
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-                sx={{
-                  height: "36px",
-                }}
-              >
-                <Tab className="tab-header" label="Works" {...a11yProps(0)} />
-                <Tab className="tab-header" label="Groups" {...a11yProps(1)} />
-              </Tabs>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            TabIndicatorProps={{ style: { backgroundColor: "#0060AA" } }}
+          >
+            <Tab label="Works" {...a11yProps(0)} />
+            <Tab label="Groups" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+
+        <Box sx={{ flexGrow: 1, overflow: "scroll", mt: 1 }}>
+          <CustomTabPanel value={value} index={0}>
+            <Box sx={{ maxHeight: 248, overflowY: "scroll" }}>
+              {tableDetails.map((tabDetail) => (
+                <Box
+                  key={tabDetail.id}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    height: 62,
+                    borderBottom: "1px solid #E0E0E0",
+                    px: 1,
+                  }}
+                >
+                  <Checkbox
+                    sx={{ height: 24, width: 24 }}
+                    value={`work_${tabDetail.id}`}
+                    checked={selectedTables.includes(`work_${tabDetail.id}`)}
+                    onChange={handleCheckboxChange}
+                  />
+                  <Box sx={{ ml: 1 }}>
+                    <div className="f-w-500 f-14 txt-shadow mb-1">
+                      {tabDetail.displayName}
+                    </div>
+                    <div className="f-w-400 f-12 txt-grey-darken4">
+                      {tabDetail.groupName}
+                    </div>
+                  </Box>
+                </Box>
+              ))}
             </Box>
-            <CustomTabPanel value={value} index={0}>
-              <div className="overflow-auto h-248px">
-                {tableDetails?.map((tabDetail) => (
-                  <div className="w-460px h-62px py-12 d-flex border-b-solid-border">
+          </CustomTabPanel>
+
+          <CustomTabPanel value={value} index={1}>
+            <Box sx={{ maxHeight: 248, overflowY: "scroll" }}>
+              {Object.entries(groupedTables).map(([groupName, tables]) => {
+                const tableNames = tables.map((t) => t.displayName).join(", ");
+                const isSelected = isGroupSelected(groupName);
+                const isPartial = isGroupPartiallySelected(groupName);
+
+                return (
+                  <Box
+                    key={groupName}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      height: 62,
+                      borderBottom: "1px solid #E0E0E0",
+                      px: 1,
+                    }}
+                  >
                     <Checkbox
-                      sx={{
-                        height: "24px",
-                        width: "24px",
-                        padding: "3.6px",
-                      }}
-                      value={`work_${tabDetail.id}`}
-                      onClick={handleCheckboxChange}
+                      sx={{ height: 24, width: 24 }}
+                      value={groupName}
+                      checked={isSelected}
+                      indeterminate={isPartial}
+                      onChange={handleGroupCheckboxChange}
                     />
-                    <div className="ml-8">
-                      <div className="f-w-500 f-14 txt-shadow mb-6">
-                        {tabDetail.displayName}
+                    <Box sx={{ ml: 1 }}>
+                      <div className="f-w-500 f-14 txt-shadow mb-1">
+                        {groupName}
                       </div>
                       <div className="f-w-400 f-12 txt-grey-darken4">
-                        {tabDetail.groupName}
+                        {tableNames}
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              Groups
-            </CustomTabPanel>
-          </div>
-        </div>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          </CustomTabPanel>
+        </Box>
 
-        {/* footer  */}
-        <div className="h-40px d-flex justify-end">
-          <div className="mr-10">
-            <Button variant="outlined" color="info" onClick={closeModal}>
-              Cancel
-            </Button>
-          </div>
-
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={getdashboardData}
-            >
-              Connect
-            </Button>
-          </div>
-        </div>
+        <Box
+          sx={{ display: "flex", justifyContent: "flex-end", mt: 2, gap: 1 }}
+        >
+          <Button variant="outlined" color="info" onClick={closeModal}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={getDashboardData}
+          >
+            Connect
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
-};
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const CustomTabPanel = (props: TabPanelProps) => {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box>{children}</Box>}
-    </div>
-  );
-};
-
-const a11yProps = (index: number) => {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
 };
 
 export default memo(ConnectDatasourceModal);

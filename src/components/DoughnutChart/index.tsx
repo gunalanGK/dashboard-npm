@@ -1,4 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import * as d3 from "d3";
 
 type DataPoint = {
@@ -39,8 +41,6 @@ const DoughnutChart: React.FC<{
 
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove();
-
-    // const colors = generateColorPalette(data.length);
 
     const color = d3
       .scaleOrdinal<string, string>()
@@ -84,33 +84,25 @@ const DoughnutChart: React.FC<{
     segments
       .append("path")
       .attr("class", "main-arc")
-      .attr("d", function (d) {
-        return arc(d as d3.PieArcDatum<DataPoint>);
-      })
+      .attr("d", arc as any)
       .attr("fill", (d) => color(String(d.data.category)))
-      .attr("stroke", "none")
-      .style("stroke-width", "0px")
       .style("opacity", 0.9);
 
     segments
       .append("path")
       .attr("class", "highlight-arc")
-      .attr("d", function (d) {
-        const highlightArc = d3
+      .attr("d", (d) =>
+        d3
           .arc<d3.PieArcDatum<DataPoint>>()
           .innerRadius(radius)
-          .outerRadius(radius + 10);
-        return highlightArc(d as d3.PieArcDatum<DataPoint>);
-      })
+          .outerRadius(radius + 10)(d)
+      )
       .attr("fill", (d) => {
         const baseColor = color(String(d.data.category));
         const fadedColor = d3.color(baseColor)?.copy();
-        if (fadedColor) {
-          fadedColor.opacity = 0.5;
-        }
+        if (fadedColor) fadedColor.opacity = 0.5;
         return fadedColor?.toString() || baseColor;
       })
-      .attr("stroke", "none")
       .style("opacity", 0);
 
     segments
@@ -130,34 +122,19 @@ const DoughnutChart: React.FC<{
         d3.select(this)
           .select(".highlight-arc")
           .transition()
-          .duration(200)
           .style("opacity", 1);
-
-        d3.select(this)
-          .select(".main-arc")
-          .transition()
-          .duration(200)
-          .attr("stroke", "none");
       })
-      .on("mousemove", function (event) {
+      .on("mousemove", (event) => {
         tooltip
           .style("left", event.pageX + 10 + "px")
           .style("top", event.pageY - 40 + "px");
       })
       .on("mouseout", function () {
         tooltip.style("opacity", 0);
-
         d3.select(this)
           .select(".highlight-arc")
           .transition()
-          .duration(200)
           .style("opacity", 0);
-
-        d3.select(this)
-          .select(".main-arc")
-          .transition()
-          .duration(200)
-          .attr("stroke", "#none");
       });
   }, [data, width, height]);
 
@@ -183,7 +160,17 @@ const DoughnutChartComponent: React.FC<DoughnutChartComponentProps> = ({
     value: Number(tableData.y[index] ?? 0),
   }));
 
-  const colors = combinedPalette;
+  const itemsPerPage = 5;
+  const [page, setPage] = useState(0);
+
+  const totalPages = Math.ceil(sampleData.length / itemsPerPage);
+  const startIndex = page * itemsPerPage;
+  const paginatedData = sampleData.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePrev = () => setPage((p) => Math.max(0, p - 1));
+  const handleNext = () => setPage((p) => Math.min(totalPages - 1, p + 1));
+
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   return (
     <div className="d-flex flex-1">
@@ -191,16 +178,139 @@ const DoughnutChartComponent: React.FC<DoughnutChartComponentProps> = ({
         <DoughnutChart data={sampleData} width={260} height={260} />
       </div>
 
-      <div className="ml-5 flex-1  d-flex gap-8 flex-column align-center overflow-auto justify-center">
-        {sampleData?.map((item, index) => (
-          <div key={index} className="d-flex items-center mb-2">
+      <div className="ml-5 flex-1 d-flex flex-column gap-2 align-start justify-center">
+        <div
+          style={{
+            width: "93px",
+            height: "165px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            gap: "20px",
+            overflow: "visible",
+            position: "relative",
+          }}
+        >
+          {paginatedData.map((item, index) => (
             <div
-              className="w-15px h-15px mr-2 radius-360"
-              style={{ backgroundColor: colors[index % colors.length] }}
-            />
-            <span>{String(item.category)}</span>
+              key={startIndex + index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                position: "relative",
+              }}
+              onMouseEnter={() => setHoverIndex(index)}
+              onMouseLeave={() => setHoverIndex(null)}
+            >
+              <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  backgroundColor:
+                    combinedPalette[
+                      (startIndex + index) % combinedPalette.length
+                    ],
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  color: "#111827",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  width: "65px",
+                  display: "inline-block",
+                  cursor: "default",
+                }}
+              >
+                {item.category}
+              </span>
+
+              <div
+                style={{
+                  position: "absolute",
+                  backgroundColor: "#1f2937",
+                  color: "#fff",
+                  padding: "6px 10px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
+                  opacity: hoverIndex === index ? 1 : 0,
+                  pointerEvents: "none",
+                  top: "-35px",
+                  left: "20px",
+                  transition: "opacity 0.2s",
+                  whiteSpace: "nowrap",
+                  zIndex: 1000,
+                }}
+              >
+                {item.category}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: "8px",
+              gap: "4px",
+            }}
+          >
+            <button
+              onClick={handlePrev}
+              disabled={page === 0}
+              style={{
+                border: "none",
+                background: "transparent",
+                cursor: page === 0 ? "not-allowed" : "pointer",
+                padding: "0",
+                display: "flex",
+                alignItems: "center",
+                color: page === 0 ? "#A6AAAF" : "#0060AA",
+                fontSize: "18px",
+              }}
+            >
+              <ArrowDropUpIcon style={{ fontSize: "18px" }} />
+            </button>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: "12px",
+                minWidth: "30px",
+                justifyContent: "center",
+              }}
+            >
+              {page + 1}/{totalPages}
+            </div>
+
+            <button
+              onClick={handleNext}
+              disabled={page === totalPages - 1}
+              style={{
+                border: "none",
+                background: "transparent",
+                cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+                padding: "0",
+                display: "flex",
+                alignItems: "center",
+                color: page === totalPages - 1 ? "#A6AAAF" : "#0060AA",
+                fontSize: "18px",
+              }}
+            >
+              <ArrowDropDownIcon style={{ fontSize: "18px" }} />
+            </button>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

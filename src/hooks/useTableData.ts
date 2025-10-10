@@ -1,29 +1,38 @@
 import { useState, useEffect } from "react";
-import { fetchTableData } from "../services/api/api";
+import { fetchTablesData } from "@/services/api/api";
+import { useTableDataStore } from "@/store/tableData.store";
 
-const useTableData = (selectedTable: string | null) => {
-  const [tableData, setTableData] = useState<unknown[]>([]);
+export const useDashboardData = () => {
+  const { setTableData, setSelectedTables, selectedTables, data } = useTableDataStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const getTableData = async () => {
-      if (selectedTable) {
-        setIsLoading(true);
-        try {
-          const data = await fetchTableData(selectedTable);
-          setTableData(data);
-        } catch {
-          setError("Error retrieving table data");
-        } finally {
-          setIsLoading(false);
-        }
+  const fetchDashboardData = async (tables: string[]) => {
+    if (tables && tables.length > 0) {
+      setIsLoading(true);
+      setError(null);
+      setSelectedTables(tables);
+      
+      try {
+        const tableData = await fetchTablesData(tables);
+        setTableData(tableData);
+      } catch (err) {
+        setError("Error retrieving table data");
+        console.error("Error fetching dashboard data:", err);
+      } finally {
+        setIsLoading(false);
       }
-    };
-    getTableData();
-  }, [selectedTable]);
+    } else {
+      setTableData(null);
+      setSelectedTables([]);
+    }
+  };
 
-  return { tableData, isLoading, setIsLoading, error };
+  return {
+    isLoading,
+    error,
+    tableData: data,
+    selectedTables,
+    fetchDashboardData,
+  };
 };
-
-export default useTableData;

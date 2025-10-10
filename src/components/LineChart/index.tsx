@@ -262,7 +262,7 @@ const LineChartComponent: React.FC<TableDataProps> = ({ tableData }) => {
       <LineChart
         data={formattedData}
         xLabel={tableData.xLabel || ""}
-        yLabel={tableData.yLabel || "Currency"}
+        yLabel={tableData.yLabel || ""}
       />
     </div>
   );

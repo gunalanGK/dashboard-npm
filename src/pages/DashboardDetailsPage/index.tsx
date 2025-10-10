@@ -1,22 +1,35 @@
-import { getGreeting } from "@/services/helper/service";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import InsertCommentOutlinedIcon from "@mui/icons-material/InsertCommentOutlined";
-import { useCallback, useEffect, useState } from "react";
-import { clientApiGetCall, clientApiPutCall } from "@/services/api/api.service";
-import { useTaskDataStore } from "@/store/taskStore";
-import DoughnutChartComponent from "@/components/DoughnutChart";
-import BarChartComponent from "@/components/BarChart";
-import { apiClient } from "@/services/api/api";
-import { useTableNameStore } from "@/store/tableNameList.store";
-import { getDateForTask, isDateTodayOrFuture } from "@/services/common.service";
-import HistogramChartComponent from "@/components/HistogramChart";
-import PieChartComponent from "@/components/PieChart";
-import LineChartComponent from "@/components/AreaChart";
-import AreaChartComponent from "@/components/LineChart";
-// import LineChartComponent from "@/components/LineChart";
-import { Button, IconButton } from "@mui/material";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
+import { getGreeting } from "@/services/helper/service";
+import { clientApiGetCall, clientApiPutCall } from "@/services/api/api.service";
+import { apiClient, fetchTablesData } from "@/services/api/api";
+import { getDateForTask, isDateTodayOrFuture } from "@/services/common.service";
+
+import { useTaskDataStore } from "@/store/taskStore";
+import { useTableDataStore } from "@/store/tableData.store";
+import { useDashboardStore } from "@/store/dashboardState.store";
+
+import DoughnutChartComponent from "@/components/DoughnutChart";
+import BarChartComponent from "@/components/BarChart";
+import HistogramChartComponent from "@/components/HistogramChart";
+import PieChartComponent from "@/components/PieChart";
+import LineChartComponent from "@/components/LineChart";
+import AreaChartComponent from "@/components/AreaChart";
+import ScatterPlotComponent from "@/components/ScatterChart";
+
+import { TableData } from "@/components/TableData";
+import LoadingPage from "../LoadingPage";
+
+type CardDataItem = {
+  metric: string;
+  value: number;
+};
 
 const DashboardDetailsPage = ({
   acceptedUserData,
@@ -38,9 +51,47 @@ const DashboardDetailsPage = ({
     updateTaskData,
     updateError,
   } = useTaskDataStore();
-  const [cardData, setcardData] = useState([]);
+  const [cardData, setcardData] = useState<CardDataItem[]>([]);
+  const { selectedTables } = useDashboardStore();
 
-  const { tableName } = useTableNameStore();
+  const [plotDatasets, setPlotDatasets] = useState<any[]>();
+  const [tablesData, setTablesData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [chartHeight, setChartHeight] = useState<number>(500);
+
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [hoverTask, setHoverTask] = useState<string | null>(null);
+  const taskRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const toggleTaskExpansion = (taskId: string) => {
+    setExpandedTasks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  useEffect(() => {
+    if (chartRef.current) {
+      setChartHeight(chartRef.current.offsetHeight);
+    }
+  }, [plotDatasets]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (chartRef.current) {
+        setChartHeight(chartRef.current.offsetHeight);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const updateRecordDrawerQuery = ({
     recordDrawerId,
@@ -51,7 +102,7 @@ const DashboardDetailsPage = ({
     recordDrawerTab?: string | null;
     recordDrawerDataset?: string | null;
   }) => {
-    if (typeof window === "undefined") return; // guard for SSR
+    if (typeof window === "undefined") return;
 
     const url = new URL(window.location.href);
     const params = url.searchParams;
@@ -59,7 +110,7 @@ const DashboardDetailsPage = ({
     const updates = { recordDrawerId, recordDrawerTab, recordDrawerDataset };
 
     Object.entries(updates).forEach(([key, value]) => {
-      if (value === undefined) return; // leave as-is
+      if (value === undefined) return;
       if (value === null) {
         params.delete(key);
       } else {
@@ -72,47 +123,41 @@ const DashboardDetailsPage = ({
   };
 
   let datasetDetailsId: any = {};
-
   datasetRecord?.forEach((data: any) => {
     datasetDetailsId = { ...datasetDetailsId, [data.id]: data };
   });
 
-  const getCoardData = async () => {
-    const response = await apiClient.post(`/get-data/metrics`, [
-      ...columnData.DataCards,
-    ]);
-
-    if (response.data) {
-      setcardData(response.data);
-    }
-  };
-
-  // const { taskData } = useTaskDataStore();
-  // const [cardData, setCardData] = useState([]);
-  const [plotDatasets, setPlotDatasets] = useState<any[]>([]);
-
   const fetchDashboardData = async () => {
     try {
-      const cardResponse = await apiClient.post(`/get-data/metrics`, [
-        ...columnData.DataCards,
+      setIsLoading(true);
+
+      const [cardResponse, plotsData, tablesData] = await Promise.all([
+        apiClient.post(`/get-data/metrics`, [...columnData.DataCards]),
+        Promise.all(
+          columnData?.plotData?.map(async (plot: any) => {
+            const response = await apiClient.get(
+              `/get-data/xy-data?${plot.params}`
+            );
+            return {
+              plot_name: plot.plot_name,
+              plot_type: plot.plot_type,
+              data: response.data,
+            };
+          }) || []
+        ),
+        fetchTablesData(selectedTables),
       ]);
+
       if (cardResponse.data) {
         setcardData(cardResponse.data);
       }
-      const plotDetails = columnData?.plotData?.map(async (plot: any) => {
-        const response = await apiClient.get(
-          `/get-data/xy-data?${plot.params}`
-        );
-        return {
-          plot_name: plot.plot_name,
-          plot_type: plot.plot_type,
-          data: response.data,
-        };
-      });
-      const PlotsData = await Promise.all(plotDetails);
-      setPlotDatasets(PlotsData);
+
+      setPlotDatasets(plotsData);
+      setTablesData(tablesData);
     } catch (error) {
       console.error("Error fetching dashboard data", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -141,11 +186,17 @@ const DashboardDetailsPage = ({
     }
   }, [columnData]);
 
+  const isAllDataLoaded =
+    cardData.length &&
+    plotDatasets &&
+    plotDatasets.length &&
+    tablesData &&
+    taskData;
+
   const getAssignTo = (assignTo: string[]) => {
     if (!acceptedUserData.data.length) {
       return "";
     }
-
     const getUserData = assignTo?.map((id) =>
       acceptedUserData.data.find((user: any) => user.id === id)
     );
@@ -175,12 +226,10 @@ const DashboardDetailsPage = ({
 
   const timeConverter = (time: string) => {
     const date = new Date(time);
-
-    const formatted = date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
-    return formatted;
   };
 
   const toggleCompleteTask = async ({
@@ -196,15 +245,6 @@ const DashboardDetailsPage = ({
     datasetName: string;
     rowId: string;
   }) => {
-    // dispatch(
-    //   toggleCompletedTask(
-    //     workspaceId,
-    //     { id, completed, recordId: rowId },
-    //     dataset.id,
-    //     dataset.datasetName
-    //   )
-    // );
-
     try {
       const url = `workspace/${workspaceId}/datasets/${datasetId}/${datasetName}/engagement/task/task-isCompleted`;
 
@@ -214,9 +254,7 @@ const DashboardDetailsPage = ({
         recordId: rowId,
       });
 
-      if (response?.data?.error) {
-        // updateError(response.data.error);
-      } else {
+      if (!response?.data?.error) {
         updateTaskDoneById({ id, done: completed });
       }
     } catch (err) {
@@ -238,13 +276,16 @@ const DashboardDetailsPage = ({
         return <LineChartComponent tableData={plot.data} />;
       case "area":
         return <AreaChartComponent tableData={plot.data} />;
+      case "scatter":
+        return <ScatterPlotComponent tableData={plot.data} />;
       default:
         return <div>Unsupported Plot</div>;
     }
   };
 
-  console.log("plotDatasets", plotDatasets);
-  console.log("taskData", taskData);
+  if (isLoading || !isAllDataLoaded) {
+    return <LoadingPage />;
+  }
 
   return (
     <>
@@ -264,9 +305,7 @@ const DashboardDetailsPage = ({
           <Button
             color="primary"
             variant="contained"
-            sx={{
-              borderRadius: "8px",
-            }}
+            sx={{ borderRadius: "8px" }}
             className="small-button dashboard-export-padding"
           >
             Export
@@ -288,19 +327,12 @@ const DashboardDetailsPage = ({
         </div>
       </div>
 
-      <div className=" d-flex h-36px mb-16 border-b-solid-popper-border ">
-        <div className=" d-flex py-10 border-b-solid-blue-darken10">
-          <div className="f-13 pl-8 f-w-500 txt-blue-darken10 d-flex align-center justify-center mr-8">
-            CRM
-          </div>
-          <MoreHorizIcon className="f-14 txt-blue-darken10" />
-        </div>
-      </div>
-
       <div className="h-92px mb-16 d-flex gap-16 overflow-auto justify-between ">
-        {cardData?.map((data: any) => (
-          <div className=" flex-1 radius-8 border-solid-border-1 p-16">
-            {/* title */}
+        {cardData?.map((data: any, index: number) => (
+          <div
+            key={index}
+            className=" flex-1 radius-8 border-solid-border-1 p-16"
+          >
             <div className="f-14 mb-8 f-w-400 txt-grey-darken4">
               {data.metric}
             </div>
@@ -309,19 +341,19 @@ const DashboardDetailsPage = ({
         ))}
       </div>
 
-      <div className="h-822px d-flex gap-16">
-        <div className="flex-1 d-flex flex-column gap-16">
-          {plotDatasets.length ? (
+      <div className="d-flex gap-16">
+        <div ref={chartRef} className="flex-1 d-flex flex-column gap-16">
+          {plotDatasets?.length ? (
             Array.from(
               { length: Math.ceil(plotDatasets?.length / 2) },
               (_, rowIdx) => (
-                <div key={rowIdx} className="d-flex gap-16">
+                <div key={rowIdx} className="d-flex gap-16 flex-1">
                   {plotDatasets
                     ?.slice(rowIdx * 2, rowIdx * 2 + 2)
                     ?.map((plot, idx) => (
                       <div
                         key={idx}
-                        className="h-388px flex-1 d-flex flex-column radius-8 border-solid-border-1"
+                        className="flex-1 d-flex flex-column radius-8 border-solid-border-1"
                       >
                         <div className="h-56px d-flex align-center justify-between p-12">
                           <div className="d-flex align-center f-w-600 f-16 txt-text-grey-primary">
@@ -329,7 +361,7 @@ const DashboardDetailsPage = ({
                           </div>
                           <MoreHorizIcon />
                         </div>
-                        <div className="flex-1 d-flex justify-center align-center p-12">
+                        <div className="flex-1 d-flex justify-center align-center p-6">
                           {renderChart(plot)}
                         </div>
                       </div>
@@ -342,54 +374,39 @@ const DashboardDetailsPage = ({
           )}
         </div>
 
-        <div className="maxh-822px w-354px border-solid-task-dashboard-border radius-8 d-flex flex-column">
-          <div className="h-42px p-12 d-flex justify-between align-center">
+        <div
+          className="w-400px border-solid-border-1 radius-8 d-flex flex-column"
+          style={{
+            height: chartHeight,
+            overflow: "hidden",
+          }}
+        >
+          <div className="h-42px p-12 d-flex justify-between align-center border-b-solid-border-1">
             <div className="f-w-600 f-16 txt-task-color">Task</div>
-            <div className="d-flex align-center h-26px">
-              <div className="mr-12 cursor-pointer">
-                <div className="w-120px h-26px border-solid-border-1 radius-8 d-flex align-center justify-between px-8">
-                  <DateRangeIcon className="f-16 txt-brown-dark1" />
-                  <div className="txt-brown-dark1 f-14 f-w-400">This week</div>
-                  <KeyboardArrowDownIcon className="f-16 txt-grey-secondary" />
-                </div>
-              </div>
-
-              <div
-                className="mr-12"
-                style={{
-                  border: "2px",
-                  backgroundColor: "#D2D4D7",
-                  borderRadius: "4px",
-                  width: "3px",
-                  height: "90%",
-                }}
-              ></div>
-
-              <img
-                className="cursor-pointer"
-                src="/images/framedashboard.svg"
-                width={16}
-                height={16}
-                alt="filter"
-              />
-            </div>
           </div>
-          <div className="bg-bg-task maxh-772px p-12 flex-1 overflow-auto">
+
+          <div
+            className="bg-bg-task p-12 flex-1"
+            style={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              backgroundColor: "#F5F5F5",
+            }}
+          >
             {taskData?.map((task) => {
               const isDueExpired = isDateTodayOrFuture(
-                getDateForTask("2025-05-07T17:56:17.099Z")
+                getDateForTask(task?.dueDate)
               );
               return (
                 <div
-                  className={`p-16 mb-10 bg-white radius-8 
-                   ${
-                     task?.dueDate
-                       ? !isDueExpired
-                         ? "border-solid-popper-border"
-                         : "border-solid-error-border"
-                       : "border-solid-popper-border"
-                   } 
-                `}
+                  key={task.id}
+                  className={`p-16 mb-10 bg-white radius-8 ${
+                    task?.dueDate
+                      ? !isDueExpired
+                        ? "border-solid-popper-border"
+                        : "border-solid-error-border"
+                      : "border-solid-popper-border"
+                  }`}
                 >
                   <div className="d-flex h-24px align-center justify-between mb-4">
                     <div className="d-flex align-center">
@@ -407,11 +424,11 @@ const DashboardDetailsPage = ({
                       {task?.completed ? (
                         <img
                           src={"/dataset-record-drawer/Check_1.svg"}
-                          alt="undone"
+                          alt="done"
                           width={20}
                           height={20}
                           className="cursor-pointer"
-                          onClick={() => {
+                          onClick={() =>
                             toggleCompleteTask({
                               id: task.id,
                               completed: !task.completed,
@@ -419,8 +436,8 @@ const DashboardDetailsPage = ({
                               datasetName:
                                 datasetDetailsId[task.workId]?.datasetName,
                               rowId: task.recordId,
-                            });
-                          }}
+                            })
+                          }
                         />
                       ) : (
                         <img
@@ -431,7 +448,7 @@ const DashboardDetailsPage = ({
                           width={20}
                           height={20}
                           className="cursor-pointer"
-                          onClick={() => {
+                          onClick={() =>
                             toggleCompleteTask({
                               id: task.id,
                               completed: !task.completed,
@@ -439,14 +456,15 @@ const DashboardDetailsPage = ({
                               datasetName:
                                 datasetDetailsId[task.workId]?.datasetName,
                               rowId: task.recordId,
-                            });
-                          }}
+                            })
+                          }
                         />
                       )}
                     </div>
                   </div>
 
                   <div
+                    ref={(el) => (taskRefs.current[task.id] = el)}
                     className="h-20px f-w-500 f-14 txt-shadow mb-4 cursor-pointer"
                     onClick={() => {
                       updateRecordDrawerQuery({
@@ -456,16 +474,85 @@ const DashboardDetailsPage = ({
                         recordDrawerTab: "3",
                       });
                     }}
+                    onMouseEnter={() => setHoverTask(task.recordId)}
+                    onMouseLeave={() => setHoverTask(null)}
+                    style={{
+                      maxWidth: "100%",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      display: "block",
+                      position: "relative",
+                    }}
                   >
                     {task.title}
+
+                    {hoverTask === task.recordId && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          backgroundColor: "#1f2937",
+                          color: "#fff",
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
+                          pointerEvents: "none",
+                          top: `${
+                            taskRefs.current[task.id]?.getBoundingClientRect()
+                              .top! - 10
+                          }px`,
+                          left: `${taskRefs.current[
+                            task.id
+                          ]?.getBoundingClientRect().left!}px`,
+                          zIndex: 1000,
+                          maxWidth: "350px",
+                          width: "auto",
+                          wordWrap: "break-word",
+                          whiteSpace: "normal",
+                          lineHeight: "1.4",
+                          transform: "translateY(-100%)",
+                          marginTop: "-5px",
+                        }}
+                      >
+                        {task.title}
+                      </div>
+                    )}
                   </div>
 
-                  {task?.description ? (
-                    <div className="maxh-40px f-w-400 f-12 txt-close-icon truncate-2-lines l-h-20">
-                      {task?.description}
+                  {task?.description && (
+                    <div className="relative">
+                      <span
+                        className="f-w-400 f-12 txt-close-icon l-h-20"
+                        style={{
+                          display: expandedTasks.has(task.id)
+                            ? "inline"
+                            : "-webkit-box",
+                          WebkitLineClamp: expandedTasks.has(task.id)
+                            ? "unset"
+                            : 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textAlign: "justify",
+                        }}
+                      >
+                        {task?.description}
+                      </span>
+                      {task?.description && task.description.length > 100 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTaskExpansion(task.id);
+                          }}
+                          className="ml-1 f-12 f-w-400 txt-blue-darken8 bg-transparent border-none cursor-pointer p-0 hover:underline"
+                          style={{ display: "inline" }}
+                        >
+                          {expandedTasks.has(task.id)
+                            ? "show less"
+                            : "show more"}
+                        </button>
+                      )}
                     </div>
-                  ) : (
-                    <></>
                   )}
 
                   <div className="mt-8 d-flex">
@@ -477,7 +564,7 @@ const DashboardDetailsPage = ({
 
                   <div className="mt-8 d-flex align-center justify-between">
                     <div>{getAssignTo(task.assignTo)}</div>
-                    {task.dueDate ? (
+                    {task.dueDate && (
                       <div
                         className={`p-4 radius-4 f-12 f-w-600 ${
                           isDueExpired
@@ -487,8 +574,6 @@ const DashboardDetailsPage = ({
                       >
                         {timeConverter(task.dueDate)}
                       </div>
-                    ) : (
-                      <></>
                     )}
                   </div>
                 </div>
@@ -497,6 +582,8 @@ const DashboardDetailsPage = ({
           </div>
         </div>
       </div>
+
+      <TableData tablesData={tablesData} workspaceId={workspaceId} />
     </>
   );
 };

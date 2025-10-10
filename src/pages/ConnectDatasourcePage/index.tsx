@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import ConnectDatasourceModal from "@/components/ConnectDatasourceModal";
 import { Button } from "@mui/material";
 import {
@@ -6,118 +6,148 @@ import {
   disconnectToDatabase,
 } from "@/services/api/database";
 import { useDashboardStore } from "@/store/dashboardState.store";
-import DashboardCharts from "../Dashboard/DashboardCharts";
-import DashboardPage from "@/DashboardPage";
 import DashboardDetailsPage from "../DashboardDetailsPage";
-import { clientApiGetCall } from "@/services/api/api.service";
-import { useDashboardTemplateStore } from "@/store/dashboardTemplate.store";
-import {
-  fetchDashboardTemplate,
-  fetchTableColumnDataTypes,
-} from "@/services/api/api";
-import { DashboardTemplate } from "@/utils/constants/dashboardTemplate";
+import { apiClient } from "@/services/api/api";
 import { useTaskDataStore } from "@/store/taskStore";
-import Config from "@/config";
+import LoadingPage from "../LoadingPage";
 
-// need to update the type
+type ConnectDatasourcePageProps = {
+  payload: any;
+  acceptedUserData: any;
+  workspaceId: string;
+  userName: string;
+  datasetRecord: any;
+};
+
 const ConnectDatasourccePage = ({
   payload,
   acceptedUserData,
   workspaceId,
   userName,
   datasetRecord,
-}: {
-  payload: any;
-  acceptedUserData: any;
-  workspaceId: any;
-  userName: string;
-  datasetRecord: any;
-}) => {
-  //  connectDatasource modal
+}: ConnectDatasourcePageProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConnect, setIsConnect] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  const { columnData, setColumnData } = useDashboardStore();
-  const { dashboardTemplateList, updateDashboardTemplateList, updateError } =
-    useDashboardTemplateStore();
+  const initializingRef = useRef(false);
+  const isConnectedRef = useRef(false);
 
+  const { columnData, setColumnData, setSelectedTables } = useDashboardStore();
   const { updateSelectTable } = useTaskDataStore();
 
-  const connectDB = async () => {
-    await connectToDatabase(payload);
-  };
+  const connectDB = useCallback(async () => {
+    if (isConnectedRef.current) return true;
 
-  const disconnectDB = async () => {};
-
-  const getDashboardTemplateList = async () => {
     try {
-      const dashboardTemplateList = await clientApiGetCall(
-        `workspace/${workspaceId}/dataset/dashboard-template`
-      );
-
-      updateDashboardTemplateList(dashboardTemplateList?.data?.data);
-    } catch (err) {
-      updateError("error");
-    }
-  };
-
-  const connectAndGetTemplate = async () => {
-    try {
-      await connectDB();
+      await connectToDatabase(payload);
       setIsConnect(true);
-    } catch (err) {}
-
-    return () => disconnectToDatabase();
-  };
-
-  useEffect(() => {
-    connectAndGetTemplate();
+      isConnectedRef.current = true;
+      return true;
+    } catch (err) {
+      console.error("DB connection failed:", err);
+      setIsConnect(false);
+      isConnectedRef.current = false;
+      return false;
+    }
   }, [payload]);
 
-  useEffect(() => {
-    if (isConnect) getDashboardTemplateList();
-  }, [isConnect]);
+  const disconnectDB = useCallback(async () => {
+    if (!isConnectedRef.current) return;
 
-  const getColumnData = async () => {
-    if (dashboardTemplateList?.length) {
-      const dashboardTemplateData = dashboardTemplateList[0];
+    try {
+      await disconnectToDatabase();
+      isConnectedRef.current = false;
+    } catch (err) {
+      console.error("DB disconnection failed:", err);
+    }
+  }, []);
 
-      if (dashboardTemplateData && dashboardTemplateData["template-type"]) {
-        const data = await fetchDashboardTemplate(
-          dashboardTemplateData.work_ids?.split(","),
-          dashboardTemplateData["template-type"]
-        );
-        setColumnData(data);
-        updateSelectTable(dashboardTemplateData.work_ids?.split(","));
+  const fetchLatestDashboard = useCallback(async () => {
+    try {
+      const response = await apiClient.get(`upload/check-dashboard`);
+
+      if (response?.data?.success && response.data.data) {
+        const dashboardData = response.data.data;
+
+        const workIds = dashboardData.workIds || [];
+
+        setColumnData(dashboardData);
+        setSelectedTables(workIds);
+        updateSelectTable(workIds);
+      } else {
+        console.log("No dashboard found or API returned failure");
+        setColumnData(null);
+        setSelectedTables([]);
+        updateSelectTable([]);
       }
+    } catch (err) {
+      console.error("Error fetching dashboard:", err);
+      setColumnData(null);
+      setSelectedTables([]);
+      updateSelectTable([]);
     }
-  };
+  }, [workspaceId, setColumnData, setSelectedTables, updateSelectTable]);
+
+  const initializeDashboard = useCallback(async () => {
+    if (initializingRef.current) {
+      return;
+    }
+
+    initializingRef.current = true;
+    setIsInitializing(true);
+    try {
+      console.log("Initializing dashboard...");
+      const dbConnected = await connectDB();
+      if (dbConnected) {
+        await fetchLatestDashboard();
+      }
+    } catch (error) {
+      console.error("Error initializing dashboard:", error);
+    } finally {
+      setIsInitializing(false);
+      initializingRef.current = false;
+    }
+  }, [connectDB, fetchLatestDashboard]);
 
   useEffect(() => {
-    if (dashboardTemplateList?.length) {
-      getColumnData();
-    }
-  }, [dashboardTemplateList]);
+    initializeDashboard();
 
-  const closeModal = () => {
+    return () => {
+      disconnectDB();
+    };
+  }, [workspaceId]);
+
+  const handleDashboardCreated = useCallback(() => {
+    fetchLatestDashboard();
+  }, [fetchLatestDashboard]);
+
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
-  };
+  }, []);
 
-  return columnData ? (
-    <div className="flex-1  p-16  overflow-auto">
-      {/* <DashboardCharts columnData={columnData} /> */}
-      <DashboardDetailsPage
-        acceptedUserData={acceptedUserData}
-        columnData={columnData}
-        workspaceId={workspaceId}
-        userName={userName}
-        datasetRecord={datasetRecord}
-      />
-    </div>
-  ) : (
+  if (isInitializing) {
+    return;
+  }
+
+  if (columnData) {
+    return (
+      <div className="flex-1 p-16 overflow-auto">
+        <DashboardDetailsPage
+          acceptedUserData={acceptedUserData}
+          columnData={columnData}
+          workspaceId={workspaceId}
+          userName={userName}
+          datasetRecord={datasetRecord}
+        />
+      </div>
+    );
+  }
+
+  return (
     <>
-      <div className="flex-1 d-flex flex-column  align-center justify-center overflow-auto">
-        <div className="d-flex flex-column  align-center justify-center">
+      <div className="flex-1 d-flex flex-column align-center justify-center overflow-auto">
+        <div className="d-flex flex-column align-center justify-center">
           <div className="w-360px h-256px d-flex align-center justify-center">
             <img
               src="/images/emptydashboard.svg"
@@ -128,28 +158,31 @@ const ConnectDatasourccePage = ({
           </div>
 
           <div className="my-16 d-flex flex-column align-center justify-center">
-            <div className="f-w-600 f-14 txt-shadow mb-8">
-              We don't have anything to show you!
+            <div className="f-w-600 f-14 txt-shadow mb-8">No dashboard yet</div>
+            <div className="f-w-400 f-12 txt-grey-darken4">
+              Create a dashboard to visualize your data, track progress, and
             </div>
             <div className="f-w-400 f-12 txt-grey-darken4">
-              Monitor your projects, track your team's progress, and more
-            </div>
-            <div className="f-w-400 f-12 txt-grey-darken4">
-              with a widget on your dashboard.
+              get insights in one place.
             </div>
           </div>
 
           <div>
             <Button
-              color="secondary"
               className="w-184px h-40px"
-              style={{ border: "none", borderRadius: "8px" }}
               variant="contained"
-              onClick={() => {
-                setIsModalOpen(true);
+              sx={{
+                backgroundColor: "#FB7000 !important",
+                color: "#fff !important",
+                borderRadius: "8px",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#e65f00 !important",
+                },
               }}
+              onClick={() => setIsModalOpen(true)}
             >
-              + Connect datasource
+              <p className="f-w-500">+ Create dashboard</p>
             </Button>
           </div>
         </div>

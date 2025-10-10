@@ -5,19 +5,23 @@ interface ScatterPlotProps {
   data: { x: string | number; y: number }[];
   width?: number;
   height?: number;
+  xLabel?: string;
+  yLabel?: string;
 }
 
 const ScatterPlot: React.FC<ScatterPlotProps> = ({
   data,
   width = 500,
   height = 300,
+  xLabel = "",
+  yLabel = "",
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     if (!data || data.length === 0) return;
 
-    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const margin = { top: 20, right: 30, bottom: 50, left: 70 }; 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -28,7 +32,8 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const isDate = data[0]?.x && !isNaN(Date.parse(data[0].x.toString()));
+    const isDate =
+      typeof data[0].x === "string" && !isNaN(Date.parse(data[0].x.toString()));
 
     const xScale = isDate
       ? d3
@@ -62,9 +67,7 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       : d3.axisBottom(xScale);
 
     if (isDate) {
-      xAxis.tickFormat((d) => {
-        return d3.timeFormat("%Y-%m-%d")(d as Date);
-      });
+      xAxis.tickFormat((d) => d3.timeFormat("%Y-%m-%d")(d as Date));
     }
 
     chart
@@ -72,14 +75,42 @@ const ScatterPlot: React.FC<ScatterPlotProps> = ({
       .attr("transform", `translate(0,${innerHeight})`)
       .call(xAxis);
 
+    if (xLabel) {
+      chart
+        .append("text")
+        .attr("x", innerWidth / 2)
+        .attr("y", innerHeight + 40)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#6b7280")
+        .style("font-size", "14px")
+        .text(xLabel);
+    }
+
     chart.append("g").call(d3.axisLeft(yScale));
+
+    if (yLabel) {
+      chart
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight / 2)
+        .attr("y", -50)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#6b7280")
+        .style("font-size", "14px")
+        .text(yLabel);
+    }
   }, [data, width, height]);
 
   return <svg ref={svgRef} width={width} height={height}></svg>;
 };
 
 interface ScatterPlotComponentProps {
-  tableData: { x: (string | number)[]; y: number[] };
+  tableData: {
+    x: (string | number)[];
+    y: number[];
+    xLabel?: string;
+    yLabel?: string;
+  };
 }
 
 const ScatterPlotComponent: React.FC<ScatterPlotComponentProps> = ({
@@ -95,7 +126,13 @@ const ScatterPlotComponent: React.FC<ScatterPlotComponentProps> = ({
     y: tableData.y[index] || 0,
   }));
 
-  return <ScatterPlot data={formattedData} />;
+  return (
+    <ScatterPlot
+      data={formattedData}
+      xLabel={tableData.xLabel || ""}
+      yLabel={tableData.yLabel || ""}
+    />
+  );
 };
 
 export default ScatterPlotComponent;

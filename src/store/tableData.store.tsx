@@ -5,9 +5,11 @@ interface TableDataStoreData {
   loading: boolean;
   data: any;
   error: string | null;
+  selectedTables: string[];
   updateLoading: () => void;
-  tableData: (data: any) => void;
+  setTableData: (data: any) => void;   
   updateError: (error: string) => void;
+  setSelectedTables: (tables: string[]) => void;
 }
 
 export const useTableDataStore = create<TableDataStoreData>()(
@@ -15,11 +17,13 @@ export const useTableDataStore = create<TableDataStoreData>()(
     loading: false,
     data: null,
     error: null,
-    updateLoading: () =>
-      set((state: TableDataStoreData) => ({ ...state, loading: true })),
-    tableData: (data: any) =>
-      set((state: TableDataStoreData) => ({ ...state, loading: false, data })),
-    updateError: (error: string) =>
-      set((state: TableDataStoreData) => ({ ...state, loading: false, error })),
+    selectedTables: [],
+    updateLoading: () => set((state) => ({ ...state, loading: true })),
+    setTableData: (data: any) => 
+      set((state) => ({ ...state, loading: false, data })),
+    updateError: (error: string) => 
+      set((state) => ({ ...state, loading: false, error })),
+    setSelectedTables: (selectedTables: string[]) => 
+      set((state) => ({ ...state, selectedTables })),
   }))
 );

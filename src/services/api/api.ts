@@ -107,12 +107,18 @@ export const fetchTableNames = async (): Promise<string[]> => {
   }
 };
 
-export const fetchTableData = async (tableName: string) => {
+export const fetchTablesData = async (selectedTables: string[])  => {
+if (selectedTables.length === 0) return null;
+
+  const queryString = selectedTables
+    ?.map((table) => `tables=${encodeURIComponent(table)}`)
+    .join("&");
+
   try {
-    const response = await apiClient.get(`/upload/table-data/${tableName}`);
+    const response = await apiClient.get(`/upload/tables-data?${queryString}`);
     return response.data;
   } catch (error) {
-    console.error("Error retrieving table data:", error);
+    console.error("Failed to fetch table data types:", error);
     throw error;
   }
 };
